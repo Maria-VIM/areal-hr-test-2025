@@ -1,0 +1,67 @@
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+} from '@nestjs/common';
+import { OrganizationService } from './organization.service';
+import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { Organization } from './entities/entity-organization';
+import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { createOrganizationSchema } from './schemas/create-organization.schema';
+import { updateOrganizationSchema } from './schemas/update-organization.schema';
+
+@Controller('organization')
+export class OrganizationController {
+    constructor(private readonly organizationService: OrganizationService) {}
+    @Get()
+    findAll(): Promise<any> {
+        return this.organizationService.findAll();
+    }
+
+    @Get('id/:id')
+    findOne(@Param('id') id: number): Promise<Organization> {
+        return this.organizationService.findOneById(id);
+    }
+
+    @Get('name/:name')
+    findOneByName(@Param('name') name: string): Promise<Organization[]> {
+        return this.organizationService.findByName(name);
+    }
+
+    @Post()
+    create(@Body() body: CreateOrganizationDto): Promise<Organization> {
+        const { error, value } = createOrganizationSchema.validate(body);
+        if (error) {
+            throw new BadRequestException({
+                message: 'Validation failed',
+                details: error.details,
+            });
+        }
+        return this.organizationService.create(value);
+    }
+
+    @Patch(':id')
+    update(
+        @Param('id') id: number,
+        @Body() body: UpdateOrganizationDto,
+    ): Promise<Organization> {
+        const { error, value } = updateOrganizationSchema.validate(body);
+        if (error) {
+            throw new BadRequestException({
+                message: 'Validation failed',
+                details: error.details,
+            });
+        }
+        return this.organizationService.update(id, value);
+    }
+
+    @Delete(':id')
+    delete(@Param('id') id: number): Promise<Organization> {
+        return this.organizationService.delete(id);
+    }
+}
