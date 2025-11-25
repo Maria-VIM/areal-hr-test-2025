@@ -5,7 +5,7 @@ export const updateOrganizationSchema = Joi.object({
         .min(2)
         .max(255)
         .optional()
-        .pattern(/^[a-zA-Z0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
         .messages({
             'string.min': 'Name must be at least 2 characters long',
             'string.max': 'Name cannot exceed 255 characters',
@@ -16,7 +16,7 @@ export const updateOrganizationSchema = Joi.object({
         .min(5)
         .max(255)
         .optional()
-        .pattern(/^[a-zA-Z0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
         .messages({
             'string.min': 'Name must be at least 5 characters long',
             'string.max': 'Name cannot exceed 255 characters',

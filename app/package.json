@@ -15,15 +15,21 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vue/cli-service": "^5.0.9",
+    "axios": "^1.13.2",
+    "oh-vue-icons": "^1.0.0-rc3",
     "pinia": "^3.0.4",
+    "primeicons": "^7.0.0",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
-    "@types/node": "^22.18.11",
+    "@types/node": "^22.19.1",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/cli-plugin-typescript": "^5.0.9",
     "@vue/tsconfig": "^0.8.1",
+    "dotenv": "^17.2.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-vue": "^10.5.1",
