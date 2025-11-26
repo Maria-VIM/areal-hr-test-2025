@@ -1,7 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { defineProps } from 'vue';
+defineProps<{ modelValue: string }>();
+const emit = defineEmits(['update:modelValue']);
+
+function onInput(e: Event) {
+  const target = e.target as HTMLTextAreaElement;
+  emit('update:modelValue', target.value);
+}
+</script>
 
 <template>
-  <textarea class="tarea-base" />
+  <textarea class="tarea-base" :value="modelValue" @input="onInput" v-bind="$attrs" />
 </template>
 
 <style scoped>

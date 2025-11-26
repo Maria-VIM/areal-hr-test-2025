@@ -75,6 +75,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 5px;
 }
 
 .org-row {

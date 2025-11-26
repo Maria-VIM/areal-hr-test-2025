@@ -75,9 +75,7 @@ watch(
 <style scoped>
 .organization-info {
   background: #ffffff;
-  border: 1px solid #f0f0f0;
   border-radius: 4px;
-  margin-top: 8px;
   transition: all 0.2s ease;
   overflow: hidden;
 }
