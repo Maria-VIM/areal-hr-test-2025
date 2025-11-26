@@ -1,15 +1,17 @@
 <script setup lang="ts">
-defineProps<{ modelValue: string }>();
-const emit = defineEmits(['update:modelValue']);
+import { ref } from 'vue';
 
-function onInput(e: Event) {
-  const target = e.target as HTMLInputElement;
-  emit('update:modelValue', target.value);
+const emit = defineEmits<{
+  (e: 'search', value: string | null): void;
+}>();
+const search = ref('');
+function doSearch() {
+  emit('search', search.value || null);
 }
 </script>
 
 <template>
-  <input class="tbox-base" :value="modelValue" @input="onInput" />
+  <input class="tbox-base" v-model="search" @input="doSearch" />
 </template>
 
 <style scoped>

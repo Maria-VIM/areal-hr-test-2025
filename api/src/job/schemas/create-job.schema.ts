@@ -5,7 +5,7 @@ export const createJobSchema = Joi.object({
         .min(2)
         .max(255)
         .required()
-        .pattern(/^[a-zA-Z0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
         .messages({
             'string.empty': 'Name is required',
             'any.required': 'Name is required',

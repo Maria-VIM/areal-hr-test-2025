@@ -4,7 +4,7 @@ export const updateJobSchema = Joi.object({
     name: Joi.string()
         .min(1)
         .max(255)
-        .pattern(/^[a-zA-Z0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
         .optional()
         .messages({
             'string.min': 'Name must be at least 2 characters long',

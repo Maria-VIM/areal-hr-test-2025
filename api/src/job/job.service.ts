@@ -23,7 +23,7 @@ export class JobService {
     }
     async findByName(name: string): Promise<Job[]> {
         const result: QueryResult = await this.dbService.query(
-            `SELECT id, name FROM "Job_title" WHERE name ILIKE $1`,
+            `SELECT id, name, deleted_at FROM "Job_title" WHERE name ILIKE $1`,
             [`%${name}%`],
         );
         return result.rows;
