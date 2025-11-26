@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { OrganizationApi } from '../api';
+import type { Organization } from '@/modules/organization/types/Organization.ts';
 
 export const useOrganizationStore = defineStore('organization', {
   state: () => ({
@@ -22,7 +23,7 @@ export const useOrganizationStore = defineStore('organization', {
       }
     },
 
-    async getOrganizationById(id: number): Promise<void> {
+    async getOrganizationById(id: number): Promise<Organization | null> {
       try {
         this.loading = true;
         const response = await OrganizationApi.getById(id);
@@ -31,6 +32,7 @@ export const useOrganizationStore = defineStore('organization', {
       } catch (error) {
         console.error('Fetch failed:', error);
         alert('Failed to get info about organization');
+        return null;
       } finally {
         this.loading = false;
       }

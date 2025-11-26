@@ -1,16 +1,9 @@
 <template>
-  <button class="icon-btn" :class="icon" @click="emit('click')"></button>
+  <button class="icon-btn" @click="emit('click')"></button>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
-
-const props = defineProps({
-  icon: {
-    type: String,
-    default: 'pi pi-pencil',
-  },
-});
+import { defineEmits } from 'vue';
 
 const emit = defineEmits(['click']);
 </script>
@@ -19,7 +12,16 @@ const emit = defineEmits(['click']);
 .icon-btn {
   background: transparent;
   border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
   cursor: pointer;
-  padding: 6px;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.icon-btn:hover {
+  opacity: 1;
+  background: rgba(109, 104, 117, 0.08);
 }
 </style>

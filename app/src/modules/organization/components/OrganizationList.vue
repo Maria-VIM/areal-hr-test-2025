@@ -61,31 +61,20 @@ onMounted(() => {
 
 <style scoped>
 .container {
-  padding: 24px;
   min-height: 100vh;
   font-family: 'Helvetica Neue', Arial, sans-serif;
-  border-left: 1px solid #e8e8e8;
 }
 
 .btn-add {
   background: #ffffff;
   color: #6d6875;
   padding: 10px 24px;
-  border-radius: 6px;
-  cursor: pointer;
   border: 1px solid #d8d8d8;
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.btn-add:hover {
-  background: #f5f5f5;
-  border-color: #9d8ca1;
-  box-shadow: 0 1px 3px rgba(109, 104, 117, 0.2);
 }
 
 .org-row {
@@ -126,24 +115,6 @@ onMounted(() => {
   display: flex;
   gap: 12px;
   align-items: center;
-}
-
-.action-edit,
-.action-delete,
-.action-restore {
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.action-edit:hover,
-.action-delete:hover,
-.action-restore:hover {
-  opacity: 1;
-  background: rgba(109, 104, 117, 0.08);
 }
 
 .action-edit {

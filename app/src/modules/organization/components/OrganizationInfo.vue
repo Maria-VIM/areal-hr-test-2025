@@ -34,7 +34,7 @@
 import { ref, watch, defineProps } from 'vue';
 import { useOrganizationStore } from '../store';
 import { useGeneralStore } from '@/store';
-import type { Organization } from '../types/organization.ts';
+import type { Organization } from '../types/Organization.ts';
 
 const props = defineProps<{
   id?: number | null;
