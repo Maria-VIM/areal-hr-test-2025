@@ -31,36 +31,65 @@ export class OrganizationService {
         return result.rows;
     }
     async create(body: CreateOrganizationDto): Promise<Organization> {
-        const { name, comment } = body;
-        const result: QueryResult = await this.dbService.query(
-            `INSERT INTO "Organization"(name, comment) VALUES ($1, $2)
+        try {
+            const { name, comment } = body;
+            const result: QueryResult = await this.dbService.query(
+                `INSERT INTO "Organization"(name, comment) VALUES ($1, $2)
                 RETURNING id, name, comment, created_at`,
-            [name, comment],
-        );
-        return result.rows[0];
+                [name, comment],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
     async update(
         id: number,
         body: UpdateOrganizationDto,
     ): Promise<Organization> {
-        const { name, comment, deleted_at } = body;
-        const result = await this.dbService.query(
-            `UPDATE "Organization" 
-                SET name = COALESCE($1, name), comment = COALESCE($2, comment), updated_at = NOW(), deleted_at = $4 WHERE id = $3 
+        try {
+            const { name, comment } = body;
+            const result = await this.dbService.query(
+                `UPDATE "Organization" 
+                SET name = COALESCE($1, name), comment = COALESCE($2, comment), updated_at = NOW() WHERE id = $3 
                 RETURNING *`,
-            [name, comment, id, deleted_at],
-        );
-        return result.rows[0];
+                [name, comment, id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    }
+    async restore(id: number): Promise<Organization> {
+        try {
+            const result = await this.dbService.query(
+                `UPDATE "Organization" 
+                SET deleted_at = null, updated_at = NOW() WHERE id = $1 
+                RETURNING *`,
+                [id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
     async delete(id: number): Promise<Organization> {
-        const result: QueryResult = await this.dbService.query(
-            `UPDATE "Organization" SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
-            [id],
-        );
-        await this.dbService.query(
-            `UPDATE "Department" SET deleted_at = NOW() WHERE organization_id = $1`,
-            [id],
-        );
-        return result.rows[0];
+        try {
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Organization" SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
+                [id],
+            );
+            await this.dbService.query(
+                `UPDATE "Department" SET deleted_at = NOW() WHERE organization_id = $1`,
+                [id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
 }

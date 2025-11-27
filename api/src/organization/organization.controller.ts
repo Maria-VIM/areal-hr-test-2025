@@ -44,7 +44,10 @@ export class OrganizationController {
         }
         return this.organizationService.create(value);
     }
-
+    @Patch('/restore/:id')
+    restore(@Param('id') id: number): Promise<Organization> {
+        return this.organizationService.restore(id);
+    }
     @Patch(':id')
     update(
         @Param('id') id: number,

@@ -24,32 +24,61 @@ export class DepartmentService {
         );
         return result.rows[0];
     }
-    async delete(id: number): Promise<Department[]> {
-        const result: QueryResult = await this.dbService.query(
-            `UPDATE "Department" SET deleted_at = NOW()
+    async delete(id: number): Promise<Department> {
+        try {
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Department" SET deleted_at = NOW()
                     WHERE id = $1 OR parent_id = $1 RETURNING *`,
-            [id],
-        );
-        return result.rows;
+                [id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
     async create(body: CreateDepartmentDto): Promise<Department> {
-        const { name, comment, organization_id, parent_id } = body;
-        const result: QueryResult = await this.dbService.query(
-            `INSERT INTO "Department" (name, comment, organization_id, parent_id)
+        try {
+            const { name, comment, organization_id, parent_id } = body;
+            const result: QueryResult = await this.dbService.query(
+                `INSERT INTO "Department" (name, comment, organization_id, parent_id)
              VALUES ($1, $2, $3, $4)
                  RETURNING id, name, comment, organization_id, parent_id, created_at, updated_at`,
-            [name, comment, organization_id, parent_id],
-        );
-        return result.rows[0];
+                [name, comment, organization_id, parent_id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.error(error);
+            return error;
+        }
     }
 
     async update(id: number, body: UpdateDepartmentDto): Promise<Department> {
-        const { name, comment, deleted_at } = body;
-        const result: QueryResult = await this.dbService.query(
-            `UPDATE "Department" SET name = COALESCE($1, name), comment = COALESCE($2, comment),
-                        deleted_at = $3 WHERE id = $4 RETURNING *`,
-            [name, comment, deleted_at, id],
-        );
-        return result.rows[0];
+        try {
+            const { name, comment } = body;
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Department" SET name = COALESCE($1, name), 
+                        comment = COALESCE($2, comment), updated_at = NOW()
+                        WHERE id = $3 RETURNING *`,
+                [name, comment, id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.error(error);
+            return error;
+        }
+    }
+
+    async restore(id: number): Promise<Department> {
+        try {
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Department" SET deleted_at = null, updated_at = NOW() WHERE id = $1 RETURNING *`,
+                [id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.error(error);
+            return error;
+        }
     }
 }

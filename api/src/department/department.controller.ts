@@ -42,6 +42,10 @@ export class DepartmentController {
         }
         return this.departmentService.update(id, value);
     }
+    @Patch('/restore/:id')
+    restore(@Param('id') id: number) {
+        return this.departmentService.restore(id);
+    }
     @Post()
     create(@Body() body: CreateDepartmentDto) {
         const { error, value } = createDepartmentSchema.validate(body);

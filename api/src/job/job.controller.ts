@@ -45,6 +45,10 @@ export class JobController {
         }
         return this.jobService.create(value);
     }
+    @Patch('/restore/:id')
+    restore(@Param('id') id: number): Promise<Job> {
+        return this.jobService.restore(id);
+    }
     @Patch(':id')
     update(@Param('id') id: number, @Body() body: UpdateJobDto): Promise<Job> {
         const { error, value } = updateJobSchema.validate(body);

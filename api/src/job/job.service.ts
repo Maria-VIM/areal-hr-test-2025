@@ -29,30 +29,57 @@ export class JobService {
         return result.rows;
     }
     async delete(id: number): Promise<Job> {
-        const result: QueryResult = await this.dbService.query(
-            `UPDATE "Job_title"
+        try {
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Job_title"
              SET deleted_at = NOW() WHERE id = $1 RETURNING *`,
-            [id],
-        );
-        return result.rows[0] || null;
+                [id],
+            );
+            return result.rows[0] || null;
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
     async create(body: CreateJobDto): Promise<Job> {
-        const { name } = body;
-        const result: QueryResult = await this.dbService.query(
-            `INSERT INTO "Job_title" (name) VALUES ($1)
+        try {
+            const { name } = body;
+            const result: QueryResult = await this.dbService.query(
+                `INSERT INTO "Job_title" (name) VALUES ($1)
                 RETURNING id, name`,
-            [name],
-        );
-        return result.rows[0];
+                [name],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
     async update(id: number, body: UpdateJobDto): Promise<Job> {
-        const { name, deleted_at } = body;
-        const result: QueryResult = await this.dbService.query(
-            `UPDATE "Job_title" SET name = COALESCE($2, name), 
-                       deleted_at = $3, updated_at = NOW()
+        try {
+            const { name } = body;
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Job_title" SET name = COALESCE($2, name), updated_at = NOW()
                 WHERE id=$1 RETURNING *`,
-            [id, name, deleted_at],
-        );
-        return result.rows[0];
+                [id, name],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    }
+    async restore(id: number): Promise<Job> {
+        try {
+            const result: QueryResult = await this.dbService.query(
+                `UPDATE "Job_title" SET deleted_at = null, updated_at = NOW()
+                WHERE id=$1 RETURNING *`,
+                [id],
+            );
+            return result.rows[0];
+        } catch (error) {
+            console.error(error);
+            return error;
+        }
     }
 }

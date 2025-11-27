@@ -27,5 +27,4 @@ export const updateDepartmentSchema = Joi.object({
             'string.pattern.base':
                 'Name can only contain letters, numbers, spaces, hyphens and underscores',
         }),
-    deleted_at: Joi.date().optional().allow(null),
 }).min(1);

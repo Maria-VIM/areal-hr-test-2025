@@ -11,7 +11,7 @@ export const jobApi = {
     return api.post(`/job`, body);
   },
   restore(id: number) {
-    return api.patch(`/job/${id}`, { deleted_at: null });
+    return api.patch(`/job/restore/${id}`, {});
   },
   update(id: number, body: any) {
     return api.patch(`/job/${id}`, body);

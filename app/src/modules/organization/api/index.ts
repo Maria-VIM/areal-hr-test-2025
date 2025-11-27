@@ -11,10 +11,7 @@ export const OrganizationApi = {
     return api.delete(`/organization/${id}`);
   },
   restore(id: number) {
-    const body = {
-      deleted_at: null,
-    };
-    return api.patch(`/organization/${id}`, body);
+    return api.patch(`/organization/restore/${id}`, {});
   },
   update(id: number, body: any) {
     return api.patch(`/organization/${id}`, body);

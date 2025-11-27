@@ -14,7 +14,7 @@ export const departmentsApi = {
     return api.post(`/department`, body);
   },
   restore(id: number) {
-    return api.patch(`/department/${id}`, { deleted_at: null });
+    return api.patch(`/department/restore/${id}`, {});
   },
   update(id: number, body: any) {
     return api.patch(`/department/${id}`, body);
