@@ -12,7 +12,7 @@ export class DepartmentService {
         organization_id: number,
     ): Promise<Department[]> {
         const result: QueryResult = await this.dbService.query(
-            `SELECT id, name, parent_id FROM "Department" WHERE organization_id = $1`,
+            `SELECT id, name, parent_id, deleted_at FROM "Department" WHERE organization_id = $1`,
             [organization_id],
         );
         return result.rows;
@@ -33,10 +33,12 @@ export class DepartmentService {
         return result.rows;
     }
     async create(body: CreateDepartmentDto): Promise<Department> {
-        const { name, comment, parent_id, organization_id } = body;
+        const { name, comment, organization_id, parent_id } = body;
         const result: QueryResult = await this.dbService.query(
-            `INSERT INTO "Department" VALUES ($1, $2, $3, $4) RETURNING id, name`,
-            [name, organization_id, parent_id, comment],
+            `INSERT INTO "Department" (name, comment, organization_id, parent_id)
+             VALUES ($1, $2, $3, $4)
+                 RETURNING id, name, comment, organization_id, parent_id, created_at, updated_at`,
+            [name, comment, organization_id, parent_id],
         );
         return result.rows[0];
     }

@@ -17,7 +17,7 @@ export const useOrganizationStore = defineStore('organization', {
         this.organizations = response.data.sort((a: any, b: any) => a.id - b.id);
       } catch (error) {
         console.error(error);
-        alert('Failed to load organizations');
+        alert('Cannot load organizations');
       } finally {
         this.loading = false;
       }
@@ -30,8 +30,8 @@ export const useOrganizationStore = defineStore('organization', {
         this.organization = response.data;
         return response.data;
       } catch (error) {
-        console.error('Fetch failed:', error);
-        alert('Failed to get info about organization');
+        console.error(error);
+        alert('Cannot get info about organization');
         return null;
       } finally {
         this.loading = false;
@@ -44,8 +44,8 @@ export const useOrganizationStore = defineStore('organization', {
         await OrganizationApi.create(body);
         await this.fetchOrganizations();
       } catch (error) {
-        console.error('Create failed:', error);
-        alert('Failed to create organization');
+        console.error(error);
+        alert('Cannot create organization');
       } finally {
         this.loading = false;
       }
@@ -57,8 +57,8 @@ export const useOrganizationStore = defineStore('organization', {
         await OrganizationApi.update(id, body);
         await this.fetchOrganizations();
       } catch (error) {
-        console.error('Update failed:', error);
-        alert('Failed to update organization');
+        console.error(error);
+        alert('Cannot update organization');
       } finally {
         this.loading = false;
       }
@@ -87,7 +87,7 @@ export const useOrganizationStore = defineStore('organization', {
         await this.fetchOrganizations();
       } catch (error) {
         console.error('Restore failed:', error);
-        alert('Failed to restore organization');
+        alert('Cannot restore organization');
       } finally {
         this.loading = false;
       }

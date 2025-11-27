@@ -17,13 +17,13 @@ import { createDepartmentSchema } from './schemas/create-department.schema';
 @Controller('department')
 export class DepartmentController {
     constructor(private readonly departmentService: DepartmentService) {}
-    @Get('/organization:organization_id')
+    @Get('/organization/:organization_id')
     findAll(
         @Param('organization_id') organization_id: number,
     ): Promise<Department[]> {
         return this.departmentService.findAllByOrganizationId(organization_id);
     }
-    @Get('/id:id')
+    @Get('/id/:id')
     findOne(@Param('id') id: number): Promise<Department> {
         return this.departmentService.findOneById(id);
     }

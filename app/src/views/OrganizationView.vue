@@ -2,6 +2,7 @@
 import { OrganizationInfo, OrganizationList } from '@/modules/organization';
 import { ref } from 'vue';
 import BaseHeader from '@/layouts/BaseHeader.vue';
+import { DepartmentList } from '@/modules/departments';
 
 const selectedId = ref<number | null>(null);
 </script>
@@ -15,6 +16,7 @@ const selectedId = ref<number | null>(null);
       </aside>
       <main class="content">
         <organization-info v-if="selectedId !== null" :id="selectedId" />
+        <department-list v-if="selectedId !== null" :id="selectedId" />
         <div v-else class="placeholder">Выберите организацию для просмотра информации</div>
       </main>
     </div>
