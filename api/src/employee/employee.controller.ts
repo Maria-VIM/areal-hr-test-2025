@@ -6,7 +6,6 @@ import {
     Param,
     Patch,
     Post,
-    Query,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { Employee } from './entities/entity-employeee';
@@ -29,9 +28,19 @@ export class EmployeeController {
 
     @Get('/department/:department_id')
     getAllByDepartment(
-        @Param('department') department_id: number,
+        @Param('department_id') department_id: number,
     ): Promise<Employee[]> {
         return this.employeeService.findAllActiveByDepartment(department_id);
+    }
+
+    @Get('/deleted')
+    getAllDeleted(): Promise<Employee[]> {
+        return this.employeeService.findDeleted();
+    }
+
+    @Get('/trainees')
+    getAllTrainees(): Promise<Employee[]> {
+        return this.employeeService.findTrainees();
     }
 
     @Get('/name/:name')

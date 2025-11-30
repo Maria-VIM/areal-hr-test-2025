@@ -37,16 +37,32 @@ export class EmployeeService {
             `SELECT e.id, e.first_name, e.last_name, e.middle_name, e.deleted_at,
                  JSON_AGG(
                      DISTINCT JSONB_BUILD_OBJECT(
-                     'department_name', d.id,
+                     'department_id', d.id,
+                     'department_name', d.name,
                      'dismissal_date', po.dismissal_date
                      )
                  ) as departments
              FROM "Employee" e
                  JOIN "Personnel_operation" po ON po.employee_id = e.id
                  JOIN "Department" d ON d.id = po.department_id
-             WHERE d.id = $1 AND dismissal_date IS NULL
+                 JOIN "Organization" o ON o.id = d.organization_id
+             WHERE d.id = $1 AND po.dismissal_date IS NULL
              GROUP BY e.id`,
             [department_id],
+        );
+        return query.rows;
+    }
+    async findTrainees(): Promise<Employee[]> {
+        const query: QueryResult = await this.dbService.query(
+            `SELECT e.id, e.first_name, e.last_name, e.middle_name
+            FROM "Employee" e WHERE e.id NOT IN (select employee_id FROM "Personnel_operation")`,
+        );
+        return query.rows;
+    }
+    async findDeleted(): Promise<Employee[]> {
+        const query: QueryResult = await this.dbService.query(
+            `SELECT e.id, e.first_name, e.last_name, e.middle_name
+            FROM "Employee" e WHERE e.deleted_at IS NOT NULL`,
         );
         return query.rows;
     }
@@ -58,7 +74,6 @@ export class EmployeeService {
         );
         return query.rows;
     }
-
     async findOneById(id: number): Promise<Employee> {
         const query: QueryResult = await this.dbService.query(
             `SELECT *

@@ -34,8 +34,7 @@ export class PersonnelOperationService {
     async delete(id: number): Promise<PersonnelOperation> {
         try {
             const query: QueryResult = await this.dbService.query(
-                `UPDATE "Personnel_operation" SET updated_at = NOW() 
-                FROM "Personnel_operation"
+                `UPDATE "Personnel_operation" SET dismissal_date = NOW() 
                 WHERE id = $1 RETURNING *`,
                 [id],
             );
