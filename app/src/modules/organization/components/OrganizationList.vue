@@ -40,6 +40,7 @@ const showModal = ref(false);
 const selectedId = ref<number | null>(null);
 const emit = defineEmits<{
   (e: 'select', id: number): void;
+  (e: 'refresh'): void;
 }>();
 function openModal(id?: number) {
   selectedId.value = id ?? null;
@@ -48,10 +49,12 @@ function openModal(id?: number) {
 
 async function deleteOrg(id: number): Promise<void> {
   await store.deleteOrganization(id);
+  emit('refresh');
 }
 
 async function restoreOrg(id: number): Promise<void> {
   await store.restoreOrganization(id);
+  emit('refresh');
 }
 
 onMounted(() => {

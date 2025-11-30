@@ -72,13 +72,16 @@ export class DepartmentService {
     async restore(id: number): Promise<Department> {
         try {
             const result: QueryResult = await this.dbService.query(
-                `UPDATE "Department" SET deleted_at = null, updated_at = NOW() WHERE id = $1 RETURNING *`,
+                `UPDATE "Department" d
+                 SET deleted_at = NULL, updated_at = NOW() FROM "Organization" o
+                 WHERE d.id = $1 AND o.id = d.organization_id AND o.deleted_at IS NULL
+                     RETURNING d.*`,
                 [id],
             );
             return result.rows[0];
         } catch (error) {
             console.error(error);
-            return error;
+            throw error;
         }
     }
 }

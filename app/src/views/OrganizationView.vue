@@ -5,6 +5,11 @@ import BaseHeader from '@/layouts/BaseHeader.vue';
 import { DepartmentList } from '@/modules/departments';
 
 const selectedId = ref<number | null>(null);
+const refreshKey = ref(0);
+
+function refresh() {
+  refreshKey.value++;
+}
 </script>
 
 <template>
@@ -12,11 +17,19 @@ const selectedId = ref<number | null>(null);
     <base-header />
     <div class="layout">
       <aside class="sidebar">
-        <organization-list @select="selectedId = $event" />
+        <organization-list @select="selectedId = $event" @refresh="refresh()" />
       </aside>
       <main class="content">
-        <organization-info v-if="selectedId !== null" :id="selectedId" />
-        <department-list v-if="selectedId !== null" :id="selectedId" />
+        <organization-info
+          v-if="selectedId !== null"
+          :id="selectedId"
+          :key="`info-${selectedId}-${refreshKey}`"
+        />
+        <department-list
+          v-if="selectedId !== null"
+          :id="selectedId"
+          :key="`depart-${selectedId}-${refreshKey}`"
+        />
         <div v-else class="placeholder">Выберите организацию для просмотра информации</div>
       </main>
     </div>

@@ -1,7 +1,6 @@
 <template>
   <li class="department-item">
     <div class="department-header">
-      <BtnBase class="btn" v-if="hasChildren" :content="isExpanded ? '−' : '+'" @click="toggle" />
       <span class="department-name">{{ department.name }}</span>
       <BtnIcon :class="[isVisible ? 'pi pi-eye-slash' : 'pi pi-eye']" @click="toggleInfo" />
     </div>
@@ -15,7 +14,7 @@
       </div>
     </transition>
     <transition name="slide-fade">
-      <ul v-if="hasChildren && isExpanded" class="department-children">
+      <ul v-if="hasChildren" class="department-children">
         <DepartmentTree
           v-for="child in department.children"
           :key="child.id"
@@ -24,6 +23,7 @@
           :is-deleted="!!child.deleted_at || isDeleted"
           :is-parent-deleted="isDeleted"
           :has-children="child.children && child.children.length > 0"
+          @departmentUpdated="handleDepartmentUpdate"
         />
       </ul>
     </transition>
@@ -32,7 +32,6 @@
 <script setup lang="ts">
 import { defineProps, ref, computed, defineEmits } from 'vue';
 import DepartmentTree from '@/modules/departments/components/DepartmentTree.vue';
-import BtnBase from '@/components/BtnBase.vue';
 import BtnIcon from '@/components/BtnIcon.vue';
 import DepartmentInfo from '@/modules/departments/components/DepartmentInfo.vue';
 import type { Department } from '@/modules/departments/types/Department.ts';
@@ -46,7 +45,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['departmentUpdated']);
 const isVisible = ref(false);
-const isExpanded = ref(false);
 const hasChildren = computed(
   () => props.department.children && props.department.children.length > 0,
 );
@@ -58,10 +56,6 @@ function handleDepartmentUpdate() {
 function toggleInfo() {
   isVisible.value = !isVisible.value;
 }
-
-function toggle() {
-  isExpanded.value = !isExpanded.value;
-}
 </script>
 
 <style scoped>
@@ -70,11 +64,6 @@ function toggle() {
   font-size: 14px;
   list-style: none;
   margin: 4px 0;
-}
-
-.btn {
-  margin: 0 5px;
-  padding: 5px 15px;
 }
 
 .department-header {
@@ -100,8 +89,8 @@ function toggle() {
 
 .department-children {
   list-style: none;
-  padding-left: 16px;
+  padding-left: 25px;
   margin-top: 4px;
-  border-left: 1px solid #f0f0f0;
+  border-left: 2px solid #f0f0f0;
 }
 </style>

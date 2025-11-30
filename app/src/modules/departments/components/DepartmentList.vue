@@ -1,6 +1,6 @@
 <template>
   <li class="department-item">
-    <ul v-if="rootDepartments.length > 0">
+    <ul v-if="rootDepartments.length > 0" :key="treeKey">
       <DepartmentTree
         v-for="dept in rootDepartments"
         :key="dept.id"
@@ -36,8 +36,11 @@ const buildTree = store.buildTree;
 
 const rootDepartments = computed(() => departments.value);
 
+const treeKey = ref(0);
 function handleDepartmentUpdate() {
-  loadDepartments();
+  loadDepartments().then(() => {
+    treeKey.value++;
+  });
 }
 
 async function loadDepartments() {

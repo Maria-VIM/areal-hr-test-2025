@@ -13,7 +13,7 @@ export const useDepartmentStore = defineStore('department', {
       try {
         this.loading = true;
         const response = await departmentsApi.getAll(organization_id);
-        this.departments = response.data;
+        this.departments = response.data.sort((a: any, b: any) => a.id - b.id);
         return response.data;
       } catch (error) {
         console.error(error);
