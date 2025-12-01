@@ -2,6 +2,7 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
     Get,
     Param,
     Patch,
@@ -78,5 +79,10 @@ export class EmployeeController {
             });
         }
         return this.employeeService.update(id, value);
+    }
+
+    @Delete(':id')
+    delete(@Param('id') id: number): Promise<Employee> {
+        return this.employeeService.delete(id);
     }
 }

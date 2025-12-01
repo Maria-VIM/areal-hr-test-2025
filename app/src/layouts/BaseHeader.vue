@@ -34,6 +34,14 @@ const isActive = (path: string) => route.path === path;
             content="Должности"
           />
         </li>
+        <li>
+          <BtnBase
+            class="nav-link"
+            :class="{ active: isActive('/employees') }"
+            @click="navigateTo('/employees')"
+            content="Работники"
+          />
+        </li>
       </ul>
     </nav>
   </header>

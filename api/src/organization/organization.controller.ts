@@ -19,8 +19,12 @@ import { updateOrganizationSchema } from './schemas/update-organization.schema';
 export class OrganizationController {
     constructor(private readonly organizationService: OrganizationService) {}
     @Get()
-    findAll(): Promise<any> {
+    findAll(): Promise<Organization[]> {
         return this.organizationService.findAll();
+    }
+    @Get('active')
+    findAllActive(): Promise<Organization[]> {
+        return this.organizationService.findAllActive();
     }
 
     @Get('id/:id')

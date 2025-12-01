@@ -8,6 +8,18 @@ export const useJobStore = defineStore('job', {
     job: null as any,
   }),
   actions: {
+    async fetchJobs(): Promise<void> {
+      try {
+        this.loading = true;
+        const response = await jobApi.getAllJobs();
+        this.jobs = response.data;
+      } catch (error) {
+        console.error(error);
+        alert('Cannot get job');
+      } finally {
+        this.loading = false;
+      }
+    },
     async getJobById(id: number): Promise<Job | null> {
       try {
         this.loading = true;

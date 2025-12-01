@@ -23,6 +23,19 @@ export const useOrganizationStore = defineStore('organization', {
       }
     },
 
+    async fetchActiveOrganizations(): Promise<void> {
+      try {
+        this.loading = true;
+        const response = await OrganizationApi.getAllActive();
+        this.organizations = response.data.sort((a: any, b: any) => a.id - b.id);
+      } catch (error) {
+        console.error(error);
+        alert('Cannot load organizations');
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async getOrganizationById(id: number): Promise<Organization | null> {
       try {
         this.loading = true;

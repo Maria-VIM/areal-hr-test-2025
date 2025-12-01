@@ -1,6 +1,9 @@
 import { api } from '@/shared/api';
 
 export const jobApi = {
+  getAllJobs() {
+    return api.get('/job');
+  },
   getById(id: number) {
     return api.get(`/job/id/${id}`);
   },

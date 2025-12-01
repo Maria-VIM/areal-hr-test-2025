@@ -11,7 +11,12 @@ function onInput(e: Event) {
 </script>
 
 <template>
-  <input class="tbox-base" :value="modelValue" @input="onInput" />
+  <input
+    class="tbox-base"
+    :value="modelValue"
+    @input="onInput"
+    pattern="[a-zA-Z0-9а-яА-ЯёЁ\s\-_.,!?@#$%&*()+=\[\]{}|:;]{1,100}"
+  />
 </template>
 
 <style scoped>

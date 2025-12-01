@@ -11,7 +11,12 @@ function doSearch() {
 </script>
 
 <template>
-  <input class="tbox-base" v-model="search" @input="doSearch" />
+  <input
+    class="tbox-base"
+    v-model="search"
+    @input="doSearch"
+    pattern="[a-zA-Z0-9а-яА-ЯёЁ\s\-_.,!?@#$%&*()+=\[\]{}|:;]{1,100}"
+  />
 </template>
 
 <style scoped>

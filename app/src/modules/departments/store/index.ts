@@ -22,6 +22,19 @@ export const useDepartmentStore = defineStore('department', {
         this.loading = false;
       }
     },
+    async fetchActiveDepartments(organization_id: number): Promise<void> {
+      try {
+        this.loading = true;
+        const response = await departmentsApi.getAllActive(organization_id);
+        this.departments = response.data.sort((a: any, b: any) => a.id - b.id);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        alert('Cannot load active departments');
+      } finally {
+        this.loading = false;
+      }
+    },
     async getDepartmentById(id: number): Promise<Department | null> {
       try {
         this.loading = true;
@@ -67,6 +80,7 @@ export const useDepartmentStore = defineStore('department', {
         this.loading = true;
         const response = await departmentsApi.update(id, body);
         this.department = response.data;
+        return response.data;
       } catch (error) {
         console.error(error);
         alert('Cannot update departments');

@@ -55,7 +55,7 @@ export class EmployeeService {
     async findTrainees(): Promise<Employee[]> {
         const query: QueryResult = await this.dbService.query(
             `SELECT e.id, e.first_name, e.last_name, e.middle_name
-            FROM "Employee" e WHERE e.id NOT IN (select employee_id FROM "Personnel_operation")`,
+            FROM "Employee" e WHERE e.deleted_at IS NULL AND e.id NOT IN (select employee_id FROM "Personnel_operation")`,
         );
         return query.rows;
     }
@@ -104,6 +104,19 @@ export class EmployeeService {
                     passport_data,
                     registration_address,
                 ],
+            );
+            return query.rows[0];
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    }
+    async delete(id: number): Promise<Employee> {
+        try {
+            const query: QueryResult = await this.dbService.query(
+                `UPDATE "Employee" SET deleted_at = NOW() 
+                  WHERE id = $1 RETURNING *`,
+                [id],
             );
             return query.rows[0];
         } catch (error) {

@@ -17,6 +17,16 @@ export class DepartmentService {
         );
         return result.rows;
     }
+    async findAllActiveByOrganizationId(
+        organization_id: number,
+    ): Promise<Department[]> {
+        const result: QueryResult = await this.dbService.query(
+            `SELECT id, name FROM "Department" 
+                WHERE organization_id = $1 AND deleted_at IS NULL`,
+            [organization_id],
+        );
+        return result.rows;
+    }
     async findOneById(id: number): Promise<Department> {
         const result: QueryResult = await this.dbService.query(
             `SELECT * FROM "Department" WHERE id = $1`,

@@ -4,6 +4,9 @@ export const departmentsApi = {
   getAll(organization_id: number) {
     return api.get(`/department/organization/${organization_id}`);
   },
+  getAllActive(organization_id: number) {
+    return api.get(`/department/active/organization/${organization_id}`);
+  },
   getById(id: number) {
     return api.get(`/department/id/${id}`);
   },

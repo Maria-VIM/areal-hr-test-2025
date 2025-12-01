@@ -10,7 +10,13 @@ function onInput(e: Event) {
 </script>
 
 <template>
-  <textarea class="tarea-base" :value="modelValue" @input="onInput" v-bind="$attrs" />
+  <textarea
+    class="tarea-base"
+    :value="modelValue"
+    @input="onInput"
+    v-bind="$attrs"
+    pattern="[a-zA-Z0-9а-яА-ЯёЁ\s\-_.,!?@#$%&*()+=\[\]{}|:;]{1,100}"
+  />
 </template>
 
 <style scoped>

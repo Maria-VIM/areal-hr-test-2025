@@ -15,6 +15,13 @@ export class OrganizationService {
         );
         return result.rows;
     }
+    async findAllActive(): Promise<Organization[]> {
+        const result: QueryResult = await this.dbService.query(
+            `SELECT id, name
+                FROM "Organization" WHERE deleted_at IS NULL`,
+        );
+        return result.rows;
+    }
     async findOneById(id: number): Promise<Organization> {
         const result: QueryResult = await this.dbService.query(
             `SELECT * FROM "Organization"
