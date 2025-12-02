@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 
-defineProps<{ modelValue: string }>();
+defineProps<{ modelValue: string; min?: number; max?: number }>();
 const emit = defineEmits(['update:modelValue']);
 
 function onInput(e: Event) {
@@ -11,12 +11,7 @@ function onInput(e: Event) {
 </script>
 
 <template>
-  <input
-    class="tbox-base"
-    :value="modelValue"
-    @input="onInput"
-    pattern="[a-zA-Z0-9а-яА-ЯёЁ\s\-_.,!?@#$%&*()+=\[\]{}|:;]{1,100}"
-  />
+  <input :min="min" :max="max" class="tbox-base" :value="modelValue" @input="onInput" />
 </template>
 
 <style scoped>
@@ -29,7 +24,6 @@ function onInput(e: Event) {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   transition: all 0.2s ease;
   color: #5a5a72;
-  margin-bottom: 16px;
   box-sizing: border-box;
 }
 .tbox-base:focus {

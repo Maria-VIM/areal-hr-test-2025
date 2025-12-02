@@ -102,7 +102,7 @@ async function loadDepartment(id: number) {
   <div class="department-modal">
     <div v-if="!isLoading" class="form-content">
       <div class="form-fields">
-        <TBoxBase v-model="form.name" placeholder="Название отдела" />
+        <TBoxBase class="tbox" v-model="form.name" placeholder="Название отдела" />
         <TAreaBase v-model="form.comment" placeholder="Комментарий к отделу" />
       </div>
       <div class="buttons">
@@ -119,4 +119,11 @@ async function loadDepartment(id: number) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.department-modal {
+  margin: 10px;
+}
+.tbox {
+  margin-bottom: 10px;
+}
+</style>

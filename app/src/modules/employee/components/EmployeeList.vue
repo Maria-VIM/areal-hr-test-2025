@@ -1,26 +1,48 @@
 <script setup lang="ts">
-import { watch, ref, defineProps } from 'vue';
+import { watch, ref, defineProps, computed } from 'vue';
 import { useEmployeesStore } from '@/modules/employee/store';
-import type { Employee } from '@/modules/employee/types/Employee.ts';
+import BtnIcon from '@/components/BtnIcon.vue';
+import EmployeeModal from '@/modules/employee/components/EmployeeModal.vue';
 
 interface FilterParams {
   orgId: number | null;
   deptId: number | null;
   option: string | null;
+  nameQuery: string | null;
 }
 const props = defineProps<{
   params: FilterParams;
 }>();
 
-const employees = ref<Employee[]>([]);
+const emit = defineEmits<{
+  (e: 'select', id: number): void;
+}>();
+
+function openModal(id?: number) {
+  selectedId.value = id;
+  showModal.value = true;
+  modalKey.value++;
+}
+
+async function deletePersonnel(id: number) {
+  await store.delete(id);
+  await fetchEmployees();
+}
+
+const selectedId = ref<number>();
+const employees = computed(() => [...store.employees]);
+const showModal = ref(false);
+const modalKey = ref(0);
 
 const store = useEmployeesStore();
 
 const fetchEmployees = async () => {
-  const { orgId, deptId, option } = props.params;
+  const { orgId, deptId, option, nameQuery } = props.params;
   try {
     if (deptId != null) {
       await store.fetchEmployeeByDepartment(deptId);
+    } else if (nameQuery != null) {
+      await store.fetchEmployeeByName(nameQuery);
     } else if (orgId != null) {
       await store.fetchEmployeesByOrganization(orgId);
     } else if (option === 'trainees') {
@@ -30,36 +52,76 @@ const fetchEmployees = async () => {
     } else {
       store.employees = [];
     }
-    employees.value = [...store.employees];
   } catch (error) {
     console.error(error);
-    employees.value = [];
   }
 };
 watch(
   () => props.params,
-  (newParams, oldParams) => {
-    console.log(newParams);
-    if (
-      newParams.orgId !== oldParams?.orgId ||
-      newParams.deptId !== oldParams?.deptId ||
-      newParams.option !== oldParams?.option
-    ) {
-      fetchEmployees();
-    }
+  () => {
+    fetchEmployees();
+  },
+  { deep: true },
+);
+
+watch(
+  () => store.employees,
+  () => {
+    fetchEmployees();
   },
   { deep: true },
 );
 </script>
 
 <template>
-  <div v-if="employees.length > 0">
-    <div v-for="employee in employees" :key="employee.id">
+  <EmployeeModal
+    :key="modalKey"
+    :id="selectedId"
+    :visible="showModal"
+    @close="showModal = false"
+    @submit="fetchEmployees"
+  />
+  <div class="container" v-if="employees.length > 0">
+    <div
+      v-for="employee in employees"
+      @click="emit('select', employee.id)"
+      :key="employee.id"
+      class="employee-row"
+    >
       <p>{{ employee.first_name }} {{ employee.last_name }} {{ employee.middle_name }}</p>
+      <div class="btn-actions" v-if="props.params.option != 'deleted'">
+        <BtnIcon class="pi pi-address-book" @click="openModal(employee.id)" />
+        <BtnIcon class="pi pi-paperclip" />
+        <BtnIcon
+          class="pi pi-trash"
+          v-if="props.params.option == 'trainees'"
+          @click="deletePersonnel(employee.id)"
+        />
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.container {
+  min-height: 100vh;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
 
-<style scoped></style>
+.employee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  margin-top: 8px;
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.employee-row:hover {
+  background: #f8f8f8;
+  border-color: #e0e0e0;
+}
+</style>

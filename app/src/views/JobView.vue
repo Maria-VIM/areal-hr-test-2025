@@ -15,7 +15,7 @@ function onSearch(value: string | null) {
   <div class="page">
     <base-header />
     <div class="layout">
-      <TBoxSearch @search="onSearch" />
+      <TBoxSearch class="search" @search="onSearch" />
       <job-list :name="searchQuery" />
     </div>
   </div>
@@ -24,5 +24,9 @@ function onSearch(value: string | null) {
 <style scoped>
 .layout {
   margin-top: 5px;
+}
+
+.search {
+  margin: 5px;
 }
 </style>

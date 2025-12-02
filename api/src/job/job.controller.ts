@@ -19,8 +19,8 @@ import { updateJobSchema } from './schemas/update-job.schema';
 export class JobController {
     constructor(private readonly jobService: JobService) {}
     @Get()
-    findAll(): Promise<Job[]> {
-        return this.jobService.findAll();
+    findAllActive(): Promise<Job[]> {
+        return this.jobService.findAllActive();
     }
     @Get('id/:id')
     findOneById(@Param('id') id: number): Promise<Job> {

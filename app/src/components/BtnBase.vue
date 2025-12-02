@@ -20,6 +20,7 @@ const { content } = defineProps<{
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
+  margin-right: 5px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Helvetica Neue', Arial, sans-serif;

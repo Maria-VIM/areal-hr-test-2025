@@ -77,7 +77,7 @@ export const useEmployeesStore = defineStore('employee', {
     async getEmployeeById(id: number): Promise<Employee | null> {
       try {
         this.loading = true;
-        const response = await employeeApi.getDeleted();
+        const response = await employeeApi.getById(id);
         this.employee = response.data;
         return response.data;
       } catch (error) {
@@ -107,7 +107,7 @@ export const useEmployeesStore = defineStore('employee', {
         this.employee = response.data;
       } catch (error) {
         console.error(error);
-        alert('Cannot update departments');
+        alert('Cannot update employee');
       } finally {
         this.loading = false;
       }

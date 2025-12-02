@@ -4,7 +4,7 @@ export const createEmployeeSchema = Joi.object({
     first_name: Joi.string()
         .min(2)
         .max(255)
-        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_,.]+$/)
         .required()
         .messages({
             'string.empty': 'Name is required',
@@ -17,7 +17,7 @@ export const createEmployeeSchema = Joi.object({
     last_name: Joi.string()
         .min(2)
         .max(255)
-        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_,.]+$/)
         .required()
         .messages({
             'string.empty': 'Name is required',
@@ -40,14 +40,14 @@ export const createEmployeeSchema = Joi.object({
         }),
     date_of_birth: Joi.date().required(),
     passport_data: Joi.string()
-        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_,.]+$/)
         .required()
         .messages({
             'string.pattern.base':
                 'Name can only contain letters, numbers, spaces, hyphens and underscores',
         }),
     registration_address: Joi.string()
-        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_,.]+$/)
         .required()
         .messages({
             'string.pattern.base':

@@ -6,11 +6,16 @@ import {
     Get,
     Param,
     Post,
+    UploadedFile,
+    UseInterceptors,
 } from '@nestjs/common';
 import { File } from './entity/entity-file';
 import { FileService } from './file.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { CreateFileSchema } from './schemas/create-file.schema';
+import { FileInterceptor } from '@nestjs/platform-express';
+import path from 'node:path';
+import { diskStorage } from 'multer';
 
 @Controller('file')
 export class FileController {
@@ -32,9 +37,23 @@ export class FileController {
         return this.fileService.delete(id);
     }
 
-    @Post(':id')
-    async create(
-        @Param('id') id: number,
+    @Post(':employee_id')
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: diskStorage({
+                destination: './uploads/passport', // Ваша папка
+                filename: (req, file, callback) => {
+                    const uniqueSuffix =
+                        Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    const ext = path.extname(file.originalname);
+                    callback(null, uniqueSuffix + ext);
+                },
+            }),
+        }),
+    )
+    async uploadFile(
+        @Param('employee_id') employee_id: number,
+        @UploadedFile() file: Express.Multer.File,
         @Body() body: CreateFileDto,
     ): Promise<File> {
         const { error, value } = CreateFileSchema.validate(body);
@@ -44,6 +63,9 @@ export class FileController {
                 details: error.details,
             });
         }
-        return this.fileService.create(id, value);
+        return this.fileService.create(employee_id, {
+            ...value,
+            full_name: file.path,
+        });
     }
 }

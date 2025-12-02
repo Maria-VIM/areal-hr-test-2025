@@ -36,14 +36,14 @@ export const updateEmployeeSchema = Joi.object({
         }),
     date_of_birth: Joi.date().optional(),
     passport_data: Joi.string()
-        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_,.]+$/)
         .optional()
         .messages({
             'string.pattern.base':
-                'Name can only contain letters, numbers, spaces, hyphens and underscores',
+                'Passport data can only contain letters, numbers, spaces, hyphens, underscores, commas, dots and quotes',
         }),
     registration_address: Joi.string()
-        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_]+$/)
+        .pattern(/^[a-zA-Zа-яА-ЯёЁ0-9\s\-_,.]+$/)
         .optional()
         .messages({
             'string.pattern.base':

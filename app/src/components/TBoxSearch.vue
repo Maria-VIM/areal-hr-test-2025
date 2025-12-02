@@ -11,12 +11,7 @@ function doSearch() {
 </script>
 
 <template>
-  <input
-    class="tbox-base"
-    v-model="search"
-    @input="doSearch"
-    pattern="[a-zA-Z0-9а-яА-ЯёЁ\s\-_.,!?@#$%&*()+=\[\]{}|:;]{1,100}"
-  />
+  <input class="tbox-base" v-model="search" @input="doSearch" />
 </template>
 
 <style scoped>
@@ -29,7 +24,6 @@ function doSearch() {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   transition: all 0.2s ease;
   color: #5a5a72;
-  margin-bottom: 16px;
   box-sizing: border-box;
 }
 .tbox-base:focus {

@@ -16,7 +16,7 @@ export const employeeApi = {
   getAllByName(name: string) {
     return api.get(`/employee/name/${name}`);
   },
-  getAllById(id: number) {
+  getById(id: number) {
     return api.get(`/employee/id/${id}`);
   },
   delete(id: number) {
@@ -26,6 +26,6 @@ export const employeeApi = {
     return api.post(`/employee`, body);
   },
   update(id: number, body: any) {
-    return api.post(`/employee/${id}`, body);
+    return api.patch(`/employee/${id}`, body);
   },
 };

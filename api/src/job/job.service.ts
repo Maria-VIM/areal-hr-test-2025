@@ -8,9 +8,10 @@ import { UpdateJobDto } from './dto/update-job.dto';
 @Injectable()
 export class JobService {
     constructor(private dbService: DbService) {}
-    async findAll(): Promise<Job[]> {
+    async findAllActive(): Promise<Job[]> {
         const result: QueryResult = await this.dbService.query(
-            `SELECT id, name, deleted_at FROM "Job_title"`,
+            `SELECT id, name, deleted_at FROM "Job_title"
+                WHERE deleted_at IS NULL`,
         );
         return result.rows;
     }

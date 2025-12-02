@@ -21,6 +21,8 @@ const handleChange = () => {
 
 <style scoped>
 .static-radio input {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
   cursor: pointer;
   margin: 0;
 }
