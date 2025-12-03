@@ -3,6 +3,7 @@ import { watch, ref, defineProps, computed } from 'vue';
 import { useEmployeesStore } from '@/modules/employee/store';
 import BtnIcon from '@/components/BtnIcon.vue';
 import EmployeeModal from '@/modules/employee/components/EmployeeModal.vue';
+import { FileManager } from '@/modules/files/components';
 
 interface FilterParams {
   orgId: number | null;
@@ -24,8 +25,14 @@ function openModal(id?: number) {
   modalKey.value++;
 }
 
-async function deletePersonnel(id: number) {
-  await store.delete(id);
+function openFileModal(id: number) {
+  selectedId.value = id;
+  showFile.value = true;
+  fileKey.value++;
+}
+
+async function firedTrainees(id: number) {
+  await store.deleteEmployee(id);
   await fetchEmployees();
 }
 
@@ -33,6 +40,9 @@ const selectedId = ref<number>();
 const employees = computed(() => [...store.employees]);
 const showModal = ref(false);
 const modalKey = ref(0);
+
+const showFile = ref(false);
+const fileKey = ref(0);
 
 const store = useEmployeesStore();
 
@@ -65,7 +75,7 @@ watch(
 );
 
 watch(
-  () => store.employees,
+  () => store.version,
   () => {
     fetchEmployees();
   },
@@ -74,54 +84,41 @@ watch(
 </script>
 
 <template>
-  <EmployeeModal
-    :key="modalKey"
-    :id="selectedId"
-    :visible="showModal"
-    @close="showModal = false"
-    @submit="fetchEmployees"
-  />
-  <div class="container" v-if="employees.length > 0">
-    <div
-      v-for="employee in employees"
-      @click="emit('select', employee.id)"
-      :key="employee.id"
-      class="employee-row"
-    >
-      <p>{{ employee.first_name }} {{ employee.last_name }} {{ employee.middle_name }}</p>
-      <div class="btn-actions" v-if="props.params.option != 'deleted'">
-        <BtnIcon class="pi pi-address-book" @click="openModal(employee.id)" />
-        <BtnIcon class="pi pi-paperclip" />
-        <BtnIcon
-          class="pi pi-trash"
-          v-if="props.params.option == 'trainees'"
-          @click="deletePersonnel(employee.id)"
-        />
+  <div class="employee-list-wrapper">
+    <EmployeeModal
+      :key="modalKey"
+      :id="selectedId"
+      :visible="showModal"
+      @close="showModal = false"
+      @submit="fetchEmployees"
+    />
+    <FileManager
+      :employee-id="selectedId!"
+      :key="fileKey"
+      :visible="showFile"
+      @close="showFile = false"
+    />
+    <div class="container" v-if="employees.length > 0">
+      <div
+        v-for="employee in employees"
+        @click="emit('select', employee.id)"
+        :key="employee.id"
+        class="row"
+      >
+        <p>{{ employee.first_name }} {{ employee.last_name }} {{ employee.middle_name }}</p>
+        <div class="btn-actions" v-if="props.params.option != 'deleted'">
+          <BtnIcon class="pi pi-address-book" @click="openModal(employee.id)" />
+          <BtnIcon class="pi pi-paperclip" @click="openFileModal(employee.id)" />
+          <BtnIcon
+            class="pi pi-trash action-delete"
+            v-if="props.params.option == 'trainees'"
+            @click="firedTrainees(employee.id)"
+          />
+        </div>
       </div>
     </div>
+    <div v-else class="placeholder">Нет данных для отображения</div>
   </div>
 </template>
 
-<style scoped>
-.container {
-  min-height: 100vh;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-}
-
-.employee-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  margin-top: 8px;
-  background: #ffffff;
-  border: 1px solid #f0f0f0;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.employee-row:hover {
-  background: #f8f8f8;
-  border-color: #e0e0e0;
-}
-</style>
+<style scoped></style>

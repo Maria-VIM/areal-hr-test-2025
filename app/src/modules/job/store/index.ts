@@ -1,13 +1,18 @@
 import { defineStore } from 'pinia';
 import { jobApi } from '@/modules/job/api';
 import type { Job } from '@/modules/job/types/Job.ts';
+import type { JobForm } from '@/modules/job/types/JobForm.ts';
 export const useJobStore = defineStore('job', {
   state: () => ({
     loading: false,
-    jobs: [] as any,
-    job: null as any,
+    jobs: [] as Job[],
+    job: null as Job | null,
+    version: 0,
   }),
   actions: {
+    incrementVersion() {
+      this.version++;
+    },
     async fetchJobs(): Promise<void> {
       try {
         this.loading = true;
@@ -46,12 +51,12 @@ export const useJobStore = defineStore('job', {
         this.loading = false;
       }
     },
-    async deleteJob(id: number, name: string): Promise<void> {
+    async deleteJob(id: number): Promise<void> {
       if (!confirm('Are you sure you want to delete this job?')) return;
       try {
         this.loading = true;
         await jobApi.delete(id);
-        await this.getJobByName(name);
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot delete job');
@@ -59,12 +64,11 @@ export const useJobStore = defineStore('job', {
         this.loading = false;
       }
     },
-    async restoreJob(id: number, name: string): Promise<void> {
+    async restoreJob(id: number): Promise<void> {
       if (!confirm('Are you sure you want to restore this job?')) return;
       try {
         this.loading = true;
         await jobApi.restore(id);
-        await this.getJobByName(name);
       } catch (error) {
         console.error(error);
         alert('Cannot restore job');
@@ -72,12 +76,12 @@ export const useJobStore = defineStore('job', {
         this.loading = false;
       }
     },
-    async updateJob(id: number, name: string, body: any): Promise<void> {
+    async updateJob(id: number, body: JobForm): Promise<void> {
       if (!confirm('Are you sure you want to update this job?')) return;
       try {
         this.loading = true;
         await jobApi.update(id, body);
-        await this.getJobByName(name);
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot update job');
@@ -85,11 +89,11 @@ export const useJobStore = defineStore('job', {
         this.loading = false;
       }
     },
-    async createJob(name: string, body: any): Promise<void> {
+    async createJob(body: JobForm): Promise<void> {
       try {
         this.loading = true;
         await jobApi.create(body);
-        await this.getJobByName(name);
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot create job');

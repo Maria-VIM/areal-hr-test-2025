@@ -1,4 +1,5 @@
 import { api } from '@/shared/api';
+import type { PersonnelOperationForm } from '@/modules/personnel/types/PersonnelForm.ts';
 
 export const PersonnelApi = {
   getAllByEmployeeId(employee_id: number) {
@@ -10,10 +11,10 @@ export const PersonnelApi = {
   delete(id: number) {
     return api.delete(`/personnel-operation/${id}`);
   },
-  update(id: number, body: any) {
-    return api.patch(`/personnel-operation/id/${id}`, body);
+  update(id: number, body: PersonnelOperationForm) {
+    return api.patch(`/personnel-operation/${id}`, body);
   },
-  create(body: any) {
+  create(body: PersonnelOperationForm) {
     return api.post(`/personnel-operation`, body);
   },
 };

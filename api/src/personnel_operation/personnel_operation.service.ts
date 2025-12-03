@@ -10,7 +10,8 @@ export class PersonnelOperationService {
     constructor(private dbService: DbService) {}
     async findAllById(employee_id: number): Promise<PersonnelOperation[]> {
         const query: QueryResult = await this.dbService.query(
-            `SELECT po.id, o.name as organization, d.name as department, j.name as job, salary, dismissal_date
+            `SELECT po.id, po.employee_id, o.id as organization_id,  o.name as organization,
+                d.name as department, j.name as job, salary, dismissal_date
                 FROM "Personnel_operation" po JOIN "Job_title" j ON po.job_id = j.id
                 JOIN "Department" d ON po.department_id = d.id
                 JOIN "Organization" o ON d.organization_id = o.id
@@ -21,8 +22,9 @@ export class PersonnelOperationService {
     }
     async findOneById(id: number): Promise<PersonnelOperation> {
         const query: QueryResult = await this.dbService.query(
-            `SELECT po.id, o.name as organization, d.name as department, j.name as job, 
-       salary, employment_date, dismissal_date, po.created_at, po.updated_at
+            `SELECT po.id, po.employee_id, o.id as organization_id,  o.name as organization,
+                d.id as department_id, d.name as department, j.id as job_id,
+                j.name as job, salary, employment_date, dismissal_date, po.created_at, po.updated_at
                 FROM "Personnel_operation" po JOIN "Job_title" j ON po.job_id = j.id
                 JOIN "Department" d ON po.department_id = d.id
                 JOIN "Organization" o ON d.organization_id = o.id
@@ -76,6 +78,19 @@ export class PersonnelOperationService {
                 VALUES ($1, $2, $3, $4, $5) RETURNING *`,
                 [employee_id, department_id, job_id, salary, employment_date],
             );
+            const check: QueryResult = await this.dbService.query(
+                `SELECT 1
+                FROM "Employee"
+                WHERE id = $1 AND deleted_at IS NOT NULL`,
+                [employee_id],
+            );
+            if (check.rows.length != 0) {
+                await this.dbService.query(
+                    `UPDATE "Employee" SET deleted_at = NULL, updated_at = NOW()
+                  WHERE id = $1 AND deleted_at`,
+                    [employee_id],
+                );
+            }
             return query.rows[0];
         } catch (error) {
             console.error(error);

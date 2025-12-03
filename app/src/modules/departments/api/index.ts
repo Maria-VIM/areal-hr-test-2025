@@ -1,4 +1,5 @@
 import { api } from '@/shared/api';
+import type { DepartmentForm } from '@/modules/departments/types/DepartmentForm.ts';
 
 export const departmentsApi = {
   getAll(organization_id: number) {
@@ -13,13 +14,13 @@ export const departmentsApi = {
   delete(id: number) {
     return api.delete(`/department/${id}`);
   },
-  create(body: any) {
+  create(body: DepartmentForm) {
     return api.post(`/department`, body);
   },
   restore(id: number) {
     return api.patch(`/department/restore/${id}`, {});
   },
-  update(id: number, body: any) {
+  update(id: number, body: DepartmentForm) {
     return api.patch(`/department/${id}`, body);
   },
 };

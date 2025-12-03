@@ -1,64 +1,7 @@
-<template>
-  <div v-if="visible" class="modal">
-    <form @submit.prevent="handleSubmit">
-      <div class="container">
-        <div class="left-column">
-          <p>Имя:</p>
-          <TBoxBase v-model="form.first_name" placeholder="Введите имя" />
-          <p>Фамилия:</p>
-          <TBoxBase v-model="form.last_name" placeholder="Введите фамилию" />
-          <p>Отчество:</p>
-          <TBoxBase v-model="form.middle_name" placeholder="Введите отчество" />
-          <p>Серия паспорта:</p>
-          <TBoxBase v-model="passportSeries" placeholder="1234" />
-          <p>Номер паспорта:</p>
-          <TBoxBase v-model="passportNumber" placeholder="123456" />
-          <p>Дата рождения:</p>
-          <DateBase v-model="birthDateInput" />
-          <p>Дата выдачи паспорта:</p>
-          <DateBase v-model="passportIssueDate" />
-        </div>
-
-        <div class="right-column">
-          <p>Кем выдан паспорт:</p>
-          <TBoxBase v-model="passportIssuedBy" placeholder="ОВД района..." class="full-width" />
-          <p>Код подразделения:</p>
-          <TBoxBase v-model="departmentCode" placeholder="123-456" />
-          <p>Область/Край:</p>
-          <TBoxBase v-model="region" placeholder="Московская область" />
-          <p>Город/Населенный пункт:</p>
-          <TBoxBase v-model="city" placeholder="Москва" />
-          <p>Улица:</p>
-          <TBoxBase v-model="street" placeholder="Ленина" />
-          <div class="address-row">
-            <div class="address-item">
-              <p>Дом:</p>
-              <TBoxBase v-model="house" />
-            </div>
-            <div class="address-item">
-              <p>Корпус:</p>
-              <TBoxBase v-model="building" />
-            </div>
-            <div class="address-item">
-              <p>Квартира:</p>
-              <TBoxBase v-model="apartment" />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="active-btn">
-        <BtnBase @click="handleSubmit" :content="isEdit ? 'Изменить' : 'Добавить'" />
-        <BtnBase @click="closeModal" content="Отмена" />
-      </div>
-    </form>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import type { EmployeeForm } from '@/modules/employee/types/EmployeeForm.ts';
 import TBoxBase from '@/components/TBoxBase.vue';
-import BtnBase from '@/components/BtnBase.vue';
 import DateBase from '@/components/DateBase.vue';
 import { useEmployeesStore } from '@/modules/employee/store/index.ts';
 
@@ -153,9 +96,9 @@ const handleSubmit = () => {
   const submitData = { ...form.value };
 
   if (isEdit.value && props.id) {
-    store.update(props.id, submitData);
+    store.updateEmployee(props.id, submitData);
   } else {
-    store.create(submitData);
+    store.createEmployee(submitData);
   }
   emit('submit', submitData);
   closeModal();
@@ -180,7 +123,6 @@ const formatDateForInput = (dateStr: string): string => {
       console.error('Error parsing date:', e);
     }
   }
-
   if (dateStr.includes('.')) {
     const parts = dateStr.split('.');
     if (parts.length === 3) {
@@ -275,25 +217,99 @@ watch(
 );
 </script>
 
+<template>
+  <div v-if="visible" class="modal">
+    <form @submit.prevent="handleSubmit" class="modal-content">
+      <h3>{{ isEdit ? 'Редактировать информацию' : 'Добавить информацию' }}</h3>
+
+      <div class="base-container">
+        <div class="left-column">
+          <div class="input-field">
+            <label>Имя:</label>
+            <TBoxBase v-model="form.first_name" placeholder="Введите имя" />
+          </div>
+          <div class="input-field">
+            <label>Фамилия:</label>
+            <TBoxBase v-model="form.last_name" placeholder="Введите фамилию" />
+          </div>
+          <div class="input-field">
+            <label>Отчество:</label>
+            <TBoxBase v-model="form.middle_name" placeholder="Введите отчество" />
+          </div>
+          <div class="input-field">
+            <label>Серия паспорта:</label>
+            <TBoxBase v-model="passportSeries" placeholder="1234" />
+          </div>
+          <div class="input-field">
+            <label>Номер паспорта:</label>
+            <TBoxBase v-model="passportNumber" placeholder="123456" />
+          </div>
+          <div class="input-field">
+            <label>Дата рождения:</label>
+            <DateBase v-model="birthDateInput" />
+          </div>
+          <div class="input-field">
+            <label>Дата выдачи паспорта:</label>
+            <DateBase v-model="passportIssueDate" />
+          </div>
+        </div>
+
+        <div class="right-column">
+          <div class="input-field">
+            <label>Кем выдан паспорт:</label>
+            <TBoxBase v-model="passportIssuedBy" placeholder="ОВД района..." class="full-width" />
+          </div>
+          <div class="input-field">
+            <label>Код подразделения:</label>
+            <TBoxBase v-model="departmentCode" placeholder="123-456" />
+          </div>
+          <div class="input-field">
+            <label>Область/Край:</label>
+            <TBoxBase v-model="region" placeholder="Московская область" />
+          </div>
+          <div class="input-field">
+            <label>Город/Населенный пункт:</label>
+            <TBoxBase v-model="city" placeholder="Москва" />
+          </div>
+          <div class="input-field">
+            <label>Улица:</label>
+            <TBoxBase v-model="street" placeholder="Ленина" />
+          </div>
+          <div class="input-field">
+            <label>Адрес:</label>
+            <div class="address-row">
+              <div class="address-item">
+                <TBoxBase v-model="house" placeholder="Дом" />
+              </div>
+              <div class="address-item">
+                <TBoxBase v-model="building" placeholder="Корпус" />
+              </div>
+              <div class="address-item">
+                <TBoxBase v-model="apartment" placeholder="Квартира" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button type="submit" class="btn-primary">{{ isEdit ? 'Изменить' : 'Добавить' }}</button>
+        <button type="button" @click="closeModal" class="btn-secondary">Отмена</button>
+      </div>
+    </form>
+  </div>
+</template>
+
 <style scoped>
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
+.modal-content {
   width: 100%;
-  height: 100%;
-  background: rgba(107, 112, 141, 0.4);
-  backdrop-filter: blur(2px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  max-width: 900px;
+  max-height: 80vh;
 }
-.container {
+
+.base-container {
   display: flex;
-  flex-direction: row;
   gap: 40px;
-  margin: 0 auto;
 }
 
 .left-column,
@@ -301,37 +317,39 @@ watch(
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
-p {
-  margin: 0;
-  font-weight: 500;
+.input-field {
+  margin-bottom: 20px;
+}
+
+.input-field label {
+  display: block;
+  margin-bottom: 6px;
   font-size: 14px;
-  color: #333;
+  color: #424242;
+  font-weight: 500;
+}
+
+.address-row {
+  display: flex;
+  gap: 12px;
+}
+
+.address-item {
+  flex: 1;
 }
 
 .full-width {
   width: 100%;
 }
 
-.address-row {
+.buttons {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.address-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.address-item p {
-  margin-bottom: 4px;
-}
-
-.active-btn {
-  margin-top: 15px;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e8e8e8;
 }
 </style>

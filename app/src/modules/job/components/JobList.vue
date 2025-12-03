@@ -2,10 +2,10 @@
 import { defineProps, watch, ref } from 'vue';
 import { useJobStore } from '@/modules/job/store';
 import type { Job } from '@/modules/job/types/Job.ts';
-import BtnIcon from '@/components/BtnIcon.vue';
-import BtnBase from '@/components/BtnBase.vue';
 import JobModal from '@/modules/job/components/JobModal.vue';
 import JobInfo from '@/modules/job/components/JobInfo.vue';
+import BtnBase from '@/components/BtnBase.vue';
+import BtnIcon from '@/components/BtnIcon.vue';
 
 const props = defineProps<{
   name?: string | number | null;
@@ -45,13 +45,13 @@ async function loadJobs() {
 
 async function restoreJob(id: number) {
   if (!props.name) return;
-  await store.restoreJob(id, props.name.toString());
+  await store.restoreJob(id);
   await loadJobs();
 }
 
 async function deleteJob(id: number) {
   if (!props.name) return;
-  await store.deleteJob(id, props.name.toString());
+  await store.deleteJob(id);
   await loadJobs();
 }
 
@@ -69,76 +69,41 @@ watch(
 </script>
 
 <template>
-  <BtnBase class="btn-add" @click="openModal()" content="Добавить должность" />
+  <BtnBase content="Добавить" @click="openModal()" class="add-base-btn" />
+
   <JobModal
     :visible="showModal"
     :id="selectedId"
     :name="props.name?.toString()"
     @close="handleClose"
   />
+
   <JobInfo :visible="showInfo" :id="selectedId" @close="handleClose" />
-  <div class="job-container">
-    <div
-      v-for="j in job"
-      :key="j.id"
-      class="job-row"
-      @click="openInfo(j.id)"
-      :class="{ deleted: j.deleted_at }"
-    >
-      <div class="job-name">{{ j.name }}</div>
-      <div class="job-actions" v-if="!j.deleted_at">
-        <BtnIcon class="pi pi-pencil action-edit" @click="openModal(j.id)" />
-        <BtnIcon class="pi pi-trash action-delete" @click="deleteJob(j.id)" />
+
+  <div class="container">
+    <div v-for="j in job" :key="j.id" class="row" :class="{ deleted: j.deleted_at }">
+      <div class="name" @click="openInfo(j.id)">{{ j.name }}</div>
+
+      <div class="actions" v-if="!j.deleted_at">
+        <BtnIcon
+          class="pi pi-pencil action-edit"
+          style="cursor: pointer; font-size: 14px"
+          @click="openModal(j.id)"
+        />
+        <BtnIcon
+          class="pi pi-trash action-delete"
+          style="cursor: pointer; font-size: 14px"
+          @click="deleteJob(j.id)"
+        />
       </div>
-      <BtnIcon v-else class="pi pi-refresh action-restore" @click="restoreJob(j.id)" />
+      <BtnIcon
+        v-else
+        class="pi pi-refresh action-restore"
+        style="cursor: pointer; font-size: 14px"
+        @click="restoreJob(j.id)"
+      />
     </div>
   </div>
 </template>
 
-<style scoped>
-.btn-add {
-  width: 100%;
-  font-weight: 500;
-}
-.job-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.job-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  margin: 5px;
-  border-radius: 4px;
-}
-
-.job-row.deleted {
-  background: #f4f4f4;
-  color: #757575;
-}
-
-.job-name {
-  font-size: 14px;
-  color: #424242;
-}
-
-.job-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.action-edit {
-  color: #666;
-}
-
-.action-delete {
-  color: #d32f2f;
-}
-
-.action-restore {
-  color: #388e3c;
-}
-</style>
+<style scoped></style>

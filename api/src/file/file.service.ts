@@ -15,22 +15,21 @@ export class FileService {
         );
         return query.rows;
     }
-    async findOneById(id: number): Promise<File> {
+    async findOneByIdForDownload(id: number): Promise<File> {
         const query: QueryResult = await this.dbService.query(
             `SELECT * FROM "File" WHERE id = $1`,
             [id],
         );
         return query.rows[0];
     }
-    async create(employee_id: number, body: CreateFileDto): Promise<File> {
+    async create(body: CreateFileDto): Promise<File> {
         try {
-            const { name, full_name } = body;
+            const { employee_id, name, full_name } = body;
             const query: QueryResult = await this.dbService.query(
                 `INSERT INTO "File" (name, full_name) VALUES ($1, $2) RETURNING *`,
                 [name, full_name],
             );
             const fileId = query.rows[0].id;
-            console.log(fileId);
             await this.dbService.query(
                 `INSERT INTO "Passport_scan" (employee_id, file_id) VALUES ($1, $2)`,
                 [employee_id, fileId],

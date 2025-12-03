@@ -8,11 +8,14 @@ import RadioBtn from '@/components/RadioBtn.vue';
 import { EmployeeList, EmployeeModal } from '@/modules/employee';
 import BtnIcon from '@/components/BtnIcon.vue';
 import TBoxSearch from '@/components/TBoxSearch.vue';
+import { PersonnelList } from '@/modules/personnel';
+import { FileManager } from '@/modules/files/components';
 
 const selectedOption = ref<string | null>(null);
 const selectedOrgId = ref<number | null>(null);
 const selectedDeptId = ref<number | null>(null);
 const searchQuery = ref<string | null>(null);
+const selectedEmployeeId = ref<number>();
 const showModal = ref(false);
 
 const searchParams = ref({
@@ -55,6 +58,10 @@ const onOptionSelected = (option: string | null) => {
   }
 };
 
+function onEmployeeSelected(employeeId: number) {
+  selectedEmployeeId.value = employeeId;
+}
+
 const eraseSelectedDeptId = () => {
   selectedDeptId.value = null;
   searchQuery.value = null;
@@ -79,55 +86,100 @@ function openModal() {
 <template>
   <div class="page">
     <base-header />
-    <div class="filter-container">
-      <TBoxSearch @search="onSearch" placeholder="Поиск по имени и фамилии" :value="searchQuery" />
-      <organization-dropdown
-        :model-value="selectedOrgId"
-        @update:model-value="onOrgSelected"
-        placeholder="Выберите организацию"
-      />
-      <div class="dept-combined">
-        <department-dropdown
-          v-if="selectedOrgId"
-          :key="`dept-${selectedOrgId}-${selectedDeptId || 'null'}`"
-          :model-value="selectedDeptId"
-          @update:model-value="onDeptSelected"
-          :organization_id="selectedOrgId"
-          placeholder="Выберите отдел"
-        />
-        <BtnIcon
-          v-if="selectedDeptId"
-          class="pi pi-delete-left clear-btn-inline"
-          @click="eraseSelectedDeptId"
-          title="Очистить отдел"
-        />
-      </div>
-      <div class="radio-group">
-        <radio-btn
-          text="Стажеры"
-          value="trainees"
-          :model-value="selectedOption || 'all'"
-          @update:model-value="onOptionSelected"
-        />
-        <radio-btn
-          text="Уволенные"
-          value="deleted"
-          :model-value="selectedOption || 'all'"
-          @update:model-value="onOptionSelected"
-        />
-      </div>
+    <div class="main-layout">
+      <div class="main-content">
+        <div class="filter-container">
+          <TBoxSearch
+            @search="onSearch"
+            placeholder="Поиск по имени и фамилии"
+            :value="searchQuery"
+          />
+          <organization-dropdown
+            :model-value="selectedOrgId"
+            @update:model-value="onOrgSelected"
+            placeholder="Выберите организацию"
+          />
+          <div class="dept-combined">
+            <department-dropdown
+              v-if="selectedOrgId"
+              :key="`dept-${selectedOrgId}-${selectedDeptId || 'null'}`"
+              :model-value="selectedDeptId"
+              @update:model-value="onDeptSelected"
+              :organization_id="selectedOrgId"
+              placeholder="Выберите отдел"
+            />
+            <BtnIcon
+              v-if="selectedDeptId"
+              class="pi pi-delete-left clear-btn-inline"
+              @click="eraseSelectedDeptId"
+              title="Очистить отдел"
+            />
+          </div>
+          <div class="radio-group">
+            <radio-btn
+              text="Стажеры"
+              value="trainees"
+              :model-value="selectedOption || 'all'"
+              @update:model-value="onOptionSelected"
+            />
+            <radio-btn
+              text="Уволенные"
+              value="deleted"
+              :model-value="selectedOption || 'all'"
+              @update:model-value="onOptionSelected"
+            />
+          </div>
 
-      <btn-base content="Найти" class="search-btn" @click="handleSearch" />
-      <btn-base content="Создать" class="add-btn" @click="openModal()" />
-      <employee-list :params="employeeParams" />
+          <div class="action-buttons">
+            <btn-base content="Найти" class="search-base-btn" @click="handleSearch" />
+            <btn-base content="Создать" class="add-base-btn" @click="openModal()" />
+          </div>
+        </div>
+        <div class="employee-content">
+          <employee-list
+            @select="onEmployeeSelected"
+            class="employee-list"
+            :params="employeeParams"
+          />
+        </div>
+      </div>
+      <div class="operations-sidebar">
+        <personnel-list :employee_id="selectedEmployeeId" />
+      </div>
     </div>
+    <file-manager :employee-id="1" />
     <employee-modal :visible="showModal" @close="showModal = false" />
   </div>
 </template>
 
 <style scoped>
 .page {
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.filter-container {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  margin: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .dept-combined {
@@ -141,15 +193,18 @@ function openModal() {
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
+  background: #f8f9fa;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
-.filter-container {
-  display: grid;
-  gap: 16px;
-  padding: 20px;
-  margin: 10px auto;
-  background: white;
-  border-radius: 8px;
+.clear-btn-inline:hover {
+  background: #e9ecef;
 }
 
 .radio-group {
@@ -158,8 +213,31 @@ function openModal() {
   flex-wrap: wrap;
 }
 
-.search-btn,
-.add-btn {
-  width: 100%;
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.employee-content {
+  flex: 1;
+  padding: 0 10px 10px 10px;
+  min-height: 0;
+}
+
+.employee-list {
+  height: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.operations-sidebar {
+  min-width: 300px;
+  background: #f8f9fa;
+  border-left: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  height: 100%;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.05);
 }
 </style>

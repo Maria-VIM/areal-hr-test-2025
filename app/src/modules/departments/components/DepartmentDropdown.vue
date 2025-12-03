@@ -2,6 +2,8 @@
 import { onMounted, defineEmits, ref, watch } from 'vue';
 import { useDepartmentStore } from '@/modules/departments/store';
 import DropdownSearch from '@/components/DropdownSearch.vue';
+import type { DropdownOption } from '@/shared/types/Option.ts';
+
 const props = defineProps<{
   modelValue: number | null;
   organization_id: number;
@@ -11,10 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useDepartmentStore();
-interface DropdownOption {
-  value: number;
-  label: string;
-}
+
 const selectedDepartment = ref<DropdownOption | null>(null);
 const departmentOptions = ref<DropdownOption[]>([]);
 

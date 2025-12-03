@@ -1,4 +1,5 @@
 import { api } from '@/shared/api';
+import type { EmployeeForm } from '@/modules/employee/types/EmployeeForm.ts';
 
 export const employeeApi = {
   getAllByOrganization(organization_id: number) {
@@ -22,10 +23,10 @@ export const employeeApi = {
   delete(id: number) {
     return api.delete(`/employee/${id}`);
   },
-  create(body: any) {
+  create(body: EmployeeForm) {
     return api.post(`/employee`, body);
   },
-  update(id: number, body: any) {
+  update(id: number, body: EmployeeForm) {
     return api.patch(`/employee/${id}`, body);
   },
 };

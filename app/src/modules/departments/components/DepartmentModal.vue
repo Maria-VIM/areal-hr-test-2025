@@ -10,7 +10,7 @@ const props = defineProps<{
   id?: number | null;
   department_id?: number | null;
   organization_id: number;
-  IsEdit: 'create' | 'edit';
+  IsEdit: boolean;
 }>();
 
 const store = useDepartmentStore();
@@ -31,7 +31,7 @@ const form = ref<DepartmentForm>({
 watch(
   () => props.id,
   async (newId) => {
-    if (props.IsEdit === 'edit' && newId) {
+    if (props.IsEdit && newId) {
       await loadDepartment(newId);
     } else {
       resetForm();
@@ -45,14 +45,14 @@ async function saveDepartment() {
     alert('Please enter department name');
     return;
   }
-  if (props.IsEdit === 'edit' && props.id) {
+  if (props.IsEdit && props.id) {
     const updateData = {
       name: form.value.name,
       comment: form.value.comment,
     };
-    await store.update(props.id, updateData);
+    await store.updateDepartment(props.id, updateData);
   } else {
-    await store.create(form.value);
+    await store.createDepartment(form.value);
   }
   emit('saved');
   emit('close');
@@ -78,52 +78,44 @@ function resetForm() {
 }
 
 async function loadDepartment(id: number) {
-  isLoading.value = true;
-  try {
-    const department = await store.getDepartmentById(id);
-    if (department) {
-      form.value = {
-        id: department.id,
-        name: department.name,
-        comment: department.comment || '',
-        organization_id: department.organization_id,
-        parent_id: department.parent_id,
-      };
-    }
-  } catch (error) {
-    console.error('Error loading department:', error);
-  } finally {
-    isLoading.value = false;
+  const department = await store.getDepartmentById(id);
+  if (department) {
+    form.value = {
+      id: department.id,
+      name: department.name,
+      comment: department.comment || '',
+      organization_id: department.organization_id,
+      parent_id: department.parent_id,
+    };
   }
 }
 </script>
 
 <template>
-  <div class="department-modal">
-    <div v-if="!isLoading" class="form-content">
-      <div class="form-fields">
-        <TBoxBase class="tbox" v-model="form.name" placeholder="Название отдела" />
-        <TAreaBase v-model="form.comment" placeholder="Комментарий к отделу" />
+  <div class="modal-plain">
+    <div class="modal-content-plain">
+      <h3>{{ IsEdit ? 'Редактирование отдела' : 'Создание отдела' }}</h3>
+      <div v-if="!isLoading" class="form-content">
+        <div class="form-fields">
+          <TBoxBase v-model="form.name" placeholder="Название отдела" class="input-field" />
+          <TAreaBase
+            v-model="form.comment"
+            placeholder="Комментарий к отделу"
+            class="input-field"
+          />
+        </div>
+        <div class="buttons">
+          <BtnBase
+            @click="saveDepartment"
+            :content="IsEdit ? 'Сохранить' : 'Создать'"
+            :disabled="isLoading"
+          />
+          <BtnBase @click="cancel" content="Отмена" :disabled="isLoading" />
+        </div>
       </div>
-      <div class="buttons">
-        <BtnBase
-          @click="saveDepartment"
-          :content="props.IsEdit ? 'Сохранить' : 'Создать'"
-          class="btn-save"
-          :disabled="isLoading"
-        />
-        <BtnBase @click="cancel" content="Отмена" class="btn-cancel" :disabled="isLoading" />
-      </div>
+      <div v-else class="loading">Загрузка...</div>
     </div>
-    <div v-else class="loading">Загрузка...</div>
   </div>
 </template>
 
-<style scoped>
-.department-modal {
-  margin: 10px;
-}
-.tbox {
-  margin-bottom: 10px;
-}
-</style>
+<style scoped></style>

@@ -64,14 +64,4 @@ function refresh() {
   overflow-y: auto;
   min-height: 0;
 }
-
-.placeholder {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #6c757d;
-  font-size: 16px;
-  text-align: center;
-}
 </style>

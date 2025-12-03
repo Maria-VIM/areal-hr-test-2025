@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 
-defineProps<{ modelValue: string; min?: number; max?: number }>();
+defineProps<{ modelValue: string | number }>();
 const emit = defineEmits(['update:modelValue']);
 
 function onInput(e: Event) {
@@ -11,7 +11,7 @@ function onInput(e: Event) {
 </script>
 
 <template>
-  <input :min="min" :max="max" class="tbox-base" :value="modelValue" @input="onInput" />
+  <input class="tbox-base" :value="modelValue" @input="onInput" />
 </template>
 
 <style scoped>

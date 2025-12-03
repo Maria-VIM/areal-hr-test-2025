@@ -9,7 +9,7 @@
       @close="closeModal"
       @saved="handleSaved"
     />
-    <div v-else class="department-info">
+    <div v-else class="info">
       <div class="info-item">
         <span class="label">Name:</span>
         <span class="value">{{ department.name }}</span>
@@ -46,108 +46,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useDepartmentStore } from '@/modules/departments/store';
 import DepartmentModal from '@/modules/departments/components/DepartmentModal.vue';
 import BtnIcon from '@/components/BtnIcon.vue';
 import type { Department } from '@/modules/departments/types/Department.ts';
 import { useGeneralStore } from '@/store';
 
-interface Props {
+const props = defineProps<{
   department_id: number;
   isParentDeleted?: boolean;
-}
-
-const props = defineProps<Props>();
+}>();
 const emit = defineEmits(['departmentUpdated']);
 
 const store = useDepartmentStore();
 const generalStore = useGeneralStore();
+
 const department = ref<Department | null>(null);
 const isModalOpen = ref(false);
-const modalMode = ref<'create' | 'edit'>('create');
+const modalMode = ref<boolean>(false);
 const modalId = ref<number | null>(null);
 
 const formatDate = generalStore.formatDate;
 
-onMounted(() => {
-  loadDepartment();
-});
-
-watch(() => props.department_id, loadDepartment);
-
 async function loadDepartment() {
+  if (!props.department_id) {
+    department.value = null;
+    return;
+  }
   try {
     department.value = await store.getDepartmentById(props.department_id);
-  } catch (error) {
-    console.error('Error loading department:', error);
+  } catch (err: any) {
+    department.value = null;
+    console.error('Ошибка загрузки департамента:', err.message || err);
   }
 }
 
 function openEditModal() {
-  modalMode.value = 'edit';
+  modalMode.value = true;
   modalId.value = props.department_id;
   isModalOpen.value = true;
 }
-
 function openCreateModal() {
-  modalMode.value = 'create';
+  modalMode.value = false;
   modalId.value = null;
   isModalOpen.value = true;
 }
-
 function closeModal() {
   isModalOpen.value = false;
   modalId.value = null;
 }
-
 async function handleSaved() {
   await loadDepartment();
-  emit('departmentUpdated');
   closeModal();
 }
 
 async function deleteDepartment(id: number) {
-  if (confirm('Are you sure you want to delete this department?')) {
-    await store.delete(id);
-    await loadDepartment();
-    emit('departmentUpdated');
-  }
+  await store.deleteDepartment(id);
+  await loadDepartment();
 }
 
 async function restoreDepartment(id: number) {
-  await store.restore(id);
+  await store.restoreDepartment(id);
   await loadDepartment();
-  emit('departmentUpdated');
 }
+
+onMounted(() => loadDepartment());
+
+watch(
+  () => props.department_id,
+  async (newId, oldId) => {
+    if (newId !== oldId) {
+      await loadDepartment();
+    }
+  },
+);
+watch(
+  () => store.version,
+  () => {
+    if (props.department_id) {
+      loadDepartment();
+    }
+  },
+);
 </script>
 
-<style scoped>
-.department-info {
-  background: #ffffff;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  overflow: hidden;
-  padding: 0 20px 16px 20px;
-  border-top: 1px solid #f0f0f0;
-}
-.info-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #f8f8f8;
-}
-.label {
-  font-weight: 500;
-  color: #6d6875;
-  font-size: 13px;
-  min-width: 80px;
-  flex-shrink: 0;
-}
-
-.value {
-  color: #424242;
-  font-size: 13px;
-  flex: 1;
-}
-</style>
+<style scoped></style>

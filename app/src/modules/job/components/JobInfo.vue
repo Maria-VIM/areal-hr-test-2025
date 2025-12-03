@@ -57,7 +57,7 @@ const formatDate = generalStore.formatDate;
       </div>
       <div class="info-item">
         <span class="label">Status:</span>
-        <span class="value" :class="{ deleted: job.deleted_at }">
+        <span class="value">
           {{ job.deleted_at ? 'Deleted' : 'Active' }}
         </span>
       </div>
@@ -127,10 +127,6 @@ h4 {
   color: #424242;
   font-size: 13px;
   flex: 1;
-}
-
-.value.deleted {
-  color: #b5838d;
 }
 
 .content {

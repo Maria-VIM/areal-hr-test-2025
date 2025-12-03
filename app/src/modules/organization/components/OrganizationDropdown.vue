@@ -2,17 +2,12 @@
 import { ref, onMounted, watch } from 'vue';
 import { useOrganizationStore } from '@/modules/organization/store';
 import DropdownSearch from '@/components/DropdownSearch.vue';
+import type { DropdownOption } from '@/shared/types/Option.ts';
 
-interface DropdownOption {
-  value: number;
-  label: string;
-}
-interface Props {
-  modelValue?: number | null;
-}
-const props = withDefaults(defineProps<Props>(), {
-  modelValue: null,
-});
+const props = defineProps<{
+  modelValue: number | null;
+}>();
+
 const emit = defineEmits<{
   'update:model-value': [value: number | null];
 }>();
@@ -47,6 +42,7 @@ watch(selectedOrganization, (newValue) => {
   emit('update:model-value', newValue?.value ?? null);
 });
 </script>
+
 <template>
   <DropdownSearch
     v-model="selectedOrganization"

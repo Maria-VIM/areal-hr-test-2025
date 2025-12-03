@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia';
 import { OrganizationApi } from '../api';
 import type { Organization } from '@/modules/organization/types/Organization.ts';
+import type { OrganizationForm } from '@/modules/organization/types/OrganizationForm.ts';
 
 export const useOrganizationStore = defineStore('organization', {
   state: () => ({
-    organizations: [] as any[],
-    organization: null as any,
+    organizations: [] as Organization[],
+    organization: null as Organization | null,
     loading: false,
+    version: 0,
   }),
 
   actions: {
+    incrementVersion() {
+      this.version++;
+    },
+
     async fetchOrganizations(): Promise<void> {
       try {
         this.loading = true;
@@ -51,11 +57,11 @@ export const useOrganizationStore = defineStore('organization', {
       }
     },
 
-    async createOrganization(body: any): Promise<void> {
+    async createOrganization(body: OrganizationForm): Promise<void> {
       try {
         this.loading = true;
         await OrganizationApi.create(body);
-        await this.fetchOrganizations();
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot create organization');
@@ -64,11 +70,11 @@ export const useOrganizationStore = defineStore('organization', {
       }
     },
 
-    async updateOrganization(id: number, body: any): Promise<void> {
+    async updateOrganization(id: number, body: OrganizationForm): Promise<void> {
       try {
         this.loading = true;
         await OrganizationApi.update(id, body);
-        await this.fetchOrganizations();
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot update organization');
@@ -83,7 +89,7 @@ export const useOrganizationStore = defineStore('organization', {
       try {
         this.loading = true;
         await OrganizationApi.delete(id);
-        await this.fetchOrganizations();
+        this.incrementVersion();
       } catch (error) {
         console.error('Delete failed:', error);
         alert('Failed to delete organization');
@@ -97,7 +103,7 @@ export const useOrganizationStore = defineStore('organization', {
       try {
         this.loading = true;
         await OrganizationApi.restore(id);
-        await this.fetchOrganizations();
+        this.incrementVersion();
       } catch (error) {
         console.error('Restore failed:', error);
         alert('Cannot restore organization');

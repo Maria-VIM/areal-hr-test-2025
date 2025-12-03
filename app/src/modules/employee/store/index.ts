@@ -1,14 +1,19 @@
 import { defineStore } from 'pinia';
 import { employeeApi } from '@/modules/employee/api/intex.ts';
 import type { Employee } from '@/modules/employee/types/Employee.ts';
+import type { EmployeeForm } from '@/modules/employee/types/EmployeeForm.ts';
 
 export const useEmployeesStore = defineStore('employee', {
   state: () => ({
     loading: true,
-    employees: [] as any,
-    employee: null as any,
+    employees: [] as Employee[],
+    employee: null as Employee | null,
+    version: 0,
   }),
   actions: {
+    incrementVersion() {
+      this.version++;
+    },
     async fetchEmployeesByOrganization(organization_id: number): Promise<void> {
       try {
         this.loading = true;
@@ -88,11 +93,12 @@ export const useEmployeesStore = defineStore('employee', {
         this.loading = false;
       }
     },
-    async create(body: any): Promise<void> {
+    async createEmployee(body: EmployeeForm): Promise<void> {
       try {
         this.loading = true;
         const response = await employeeApi.create(body);
         this.employee = response.data;
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot create employee');
@@ -100,11 +106,12 @@ export const useEmployeesStore = defineStore('employee', {
         this.loading = false;
       }
     },
-    async update(id: number, body: any): Promise<void> {
+    async updateEmployee(id: number, body: EmployeeForm): Promise<void> {
       try {
         this.loading = true;
         const response = await employeeApi.update(id, body);
         this.employee = response.data;
+        this.incrementVersion();
       } catch (error) {
         console.error(error);
         alert('Cannot update employee');
@@ -112,11 +119,12 @@ export const useEmployeesStore = defineStore('employee', {
         this.loading = false;
       }
     },
-    async delete(id: number): Promise<void> {
+    async deleteEmployee(id: number): Promise<void> {
       try {
         this.loading = true;
         const response = await employeeApi.delete(id);
         this.employee = response.data;
+        this.incrementVersion();
         return response.data;
       } catch (error) {
         console.log(error);

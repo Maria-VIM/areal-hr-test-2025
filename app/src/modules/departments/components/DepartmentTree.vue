@@ -1,36 +1,5 @@
-<template>
-  <li class="department-item">
-    <div class="department-header">
-      <span class="department-name">{{ department.name }}</span>
-      <BtnIcon :class="[isVisible ? 'pi pi-eye-slash' : 'pi pi-eye']" @click="toggleInfo" />
-    </div>
-    <transition name="slide-fade">
-      <div v-if="isVisible" class="department-info-wrapper">
-        <DepartmentInfo
-          :department_id="department.id"
-          :is-parent-deleted="isParentDeleted"
-          @departmentUpdated="handleDepartmentUpdate"
-        />
-      </div>
-    </transition>
-    <transition name="slide-fade">
-      <ul v-if="hasChildren" class="department-children">
-        <DepartmentTree
-          v-for="child in department.children"
-          :key="child.id"
-          :department="child"
-          :level="level + 1"
-          :is-deleted="!!child.deleted_at || isDeleted"
-          :is-parent-deleted="isDeleted"
-          :has-children="child.children && child.children.length > 0"
-          @departmentUpdated="handleDepartmentUpdate"
-        />
-      </ul>
-    </transition>
-  </li>
-</template>
 <script setup lang="ts">
-import { defineProps, ref, computed, defineEmits } from 'vue';
+import { defineProps, ref, computed, defineEmits, watchEffect } from 'vue';
 import DepartmentTree from '@/modules/departments/components/DepartmentTree.vue';
 import BtnIcon from '@/components/BtnIcon.vue';
 import DepartmentInfo from '@/modules/departments/components/DepartmentInfo.vue';
@@ -50,13 +19,40 @@ const hasChildren = computed(
 );
 const isDeleted = computed(() => !!props.isDeleted);
 const isParentDeleted = computed(() => !!props.isParentDeleted);
-function handleDepartmentUpdate() {
-  emit('departmentUpdated');
-}
+
 function toggleInfo() {
   isVisible.value = !isVisible.value;
 }
+
+watchEffect(() => {}, { flush: 'post' });
 </script>
+
+<template>
+  <li class="department-item">
+    <div class="department-header">
+      <span class="department-name">{{ department.name }}</span>
+      <BtnIcon :class="[isVisible ? 'pi pi-eye-slash' : 'pi pi-eye']" @click="toggleInfo" />
+    </div>
+    <transition name="slide-fade">
+      <div v-if="isVisible" class="department-info-wrapper">
+        <DepartmentInfo :department_id="department.id" :is-parent-deleted="isParentDeleted" />
+      </div>
+    </transition>
+    <transition name="slide-fade">
+      <ul v-if="hasChildren" class="department-children">
+        <DepartmentTree
+          v-for="child in department.children"
+          :key="child.id"
+          :department="child"
+          :level="level + 1"
+          :is-deleted="!!child.deleted_at || isDeleted"
+          :is-parent-deleted="isDeleted"
+          :has-children="child.children && child.children.length > 0"
+        />
+      </ul>
+    </transition>
+  </li>
+</template>
 
 <style scoped>
 .department-item {

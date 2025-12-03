@@ -92,46 +92,51 @@ const selectOption = (option) => {
 
 <style scoped>
 .dropdown-search {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
   width: 100%;
-  display: block;
 }
 
 .dropdown-input {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 14px;
-  line-height: 1.5;
   box-sizing: border-box;
+  outline: none;
 }
 
 .dropdown-list {
-  width: 100%;
-  z-index: 0;
   position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
   background: white;
-  border: 1px solid #e4e7ed;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   max-height: 200px;
   overflow-y: auto;
+  z-index: 1000;
 }
 
 .dropdown-item {
-  padding: 10px 12px;
+  padding: 8px 12px;
   cursor: pointer;
   font-size: 14px;
-  line-height: 1.5;
 }
 
 .dropdown-item:hover {
-  background-color: #f5f7fa;
+  background-color: #f5f5f5;
 }
 
 .dropdown-item.no-results {
-  color: #909399;
+  color: #999;
   cursor: default;
+}
+
+.dropdown-item.no-results:hover {
+  background-color: transparent;
 }
 </style>

@@ -57,17 +57,14 @@ watch(
 async function handleSubmit() {
   try {
     const name = form.value.name.trim();
-
     if (name.length < 3) {
       alert('Пожалуйста, введите корректное значение для названия');
       return;
     }
-    const search = props.name ?? '';
     if (isEdit.value && props.id != null) {
-      await store.updateJob(props.id, search, form.value);
+      await store.updateJob(props.id, form.value);
     } else {
-      const targetName = props.name === undefined ? name : search;
-      await store.createJob(targetName, form.value);
+      await store.createJob(form.value);
     }
 
     closeModal();
@@ -82,43 +79,4 @@ function closeModal() {
 }
 </script>
 
-<style scoped>
-.modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: #fefefe;
-  padding: 12px;
-  width: 100%;
-}
-
-.modal-content h3 {
-  color: #636363;
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  text-align: center;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
-}
-
-.buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 12px;
-}
-
-.buttons button:first-child {
-  background: #949495;
-  color: white;
-}
-
-.buttons button:last-child {
-  background: transparent;
-  color: #8a8a8a;
-  border: 1px solid #d8d6e3;
-}
-</style>
+<style scoped></style>

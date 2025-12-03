@@ -1,14 +1,20 @@
 import { defineStore } from 'pinia';
 import { departmentsApi } from '@/modules/departments/api';
 import type { Department } from '@/modules/departments/types/Department.ts';
+import type { DepartmentForm } from '@/modules/departments/types/DepartmentForm.ts';
 
 export const useDepartmentStore = defineStore('department', {
   state: () => ({
     loading: false,
-    departments: [] as any,
-    department: null as any,
+    departments: [] as Department[],
+    department: null as Department | null,
+    version: 0,
   }),
   actions: {
+    incrementVersion() {
+      this.version++;
+    },
+
     async fetchDepartments(organization_id: number): Promise<void> {
       try {
         this.loading = true;
@@ -49,11 +55,12 @@ export const useDepartmentStore = defineStore('department', {
         this.loading = false;
       }
     },
-    async delete(id: number): Promise<void> {
+    async deleteDepartment(id: number): Promise<void> {
       try {
         this.loading = true;
         const response = await departmentsApi.delete(id);
         await this.getDepartmentById(id);
+        this.incrementVersion();
         return response.data;
       } catch (error) {
         console.error(error);
@@ -62,11 +69,12 @@ export const useDepartmentStore = defineStore('department', {
         this.loading = false;
       }
     },
-    async restore(id: number): Promise<void> {
+    async restoreDepartment(id: number): Promise<void> {
       try {
         this.loading = true;
         const response = await departmentsApi.restore(id);
         await this.getDepartmentById(id);
+        this.incrementVersion();
         return response.data;
       } catch (error) {
         console.error(error);
@@ -75,11 +83,12 @@ export const useDepartmentStore = defineStore('department', {
         this.loading = false;
       }
     },
-    async update(id: number, body: any): Promise<void> {
+    async updateDepartment(id: number, body: DepartmentForm): Promise<void> {
       try {
         this.loading = true;
         const response = await departmentsApi.update(id, body);
         this.department = response.data;
+        this.incrementVersion();
         return response.data;
       } catch (error) {
         console.error(error);
@@ -88,10 +97,11 @@ export const useDepartmentStore = defineStore('department', {
         this.loading = false;
       }
     },
-    async create(body: any): Promise<void> {
+    async createDepartment(body: DepartmentForm): Promise<void> {
       try {
         this.loading = true;
         const response = await departmentsApi.create(body);
+        this.incrementVersion();
         this.department = response.data;
       } catch (error) {
         console.error(error);

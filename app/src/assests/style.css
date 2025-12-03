@@ -1,3 +1,269 @@
 body {
     margin: 0;
 }
+
+.placeholder {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #6c757d;
+    font-size: 16px;
+    text-align: center;
+}
+
+/*Стиль для вывода информации*/
+.action-edit {
+    color: #6d6875;
+}
+
+.action-delete {
+    color: #7e2c3d;
+}
+
+.action-restore {
+    color: #407840;
+}
+
+.container {
+    min-height: 100vh;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.btn-add {
+    background: #ffffff;
+    color: #6d6875;
+    padding: 10px 24px;
+    border: 1px solid #d8d8d8;
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    margin-top: 8px;
+    background: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.row:hover {
+    background: #f8f8f8;
+    border-color: #e0e0e0;
+}
+
+.row.deleted {
+    background: #bdbdbd;
+}
+
+.name {
+    font-weight: 400;
+    cursor: pointer;
+    color: #424242;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.name:hover {
+    color: #6d6875;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/*Стиль для модальных окон*/
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(109, 104, 117, 0.1);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+.modal-plain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content-plain {
+    width: 100vw;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 4px;
+    width: 90%;
+    max-width: 480px;
+}
+
+.modal-content h3, .modal-content-plain h3 {
+    font-weight: 400;
+    color: #424242;
+    font-size: 16px;
+    margin: 0 0 20px;
+    text-align: center;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.buttons button:first-child {
+    background: #6d6875;
+    color: white;
+    padding: 8px 20px;
+    border: 1px solid #6d6875;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.buttons button:last-child {
+    background: transparent;
+    color: #6d6875;
+    padding: 8px 20px;
+    border: 1px solid #d8d8d8;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.input-field {
+    margin-bottom: 15px;
+}
+
+/*Стиль для информации*/
+.info {
+    background: #ffffff;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.info:hover {
+    background: #f8f8f8;
+    border-color: #e0e0e0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.header:hover {
+    background: #f5f5f5;
+}
+
+h4 {
+    font-weight: 400;
+    color: #424242;
+    font-size: 14px;
+    margin: 0;
+    transition: color 0.2s ease;
+}
+
+.header:hover h4 {
+    color: #6d6875;
+}
+
+.content {
+    padding: 0 20px 16px 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f8f8f8;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 500;
+    color: #6d6875;
+    font-size: 13px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.value {
+    color: #424242;
+    font-size: 13px;
+    flex: 1;
+}
+
+.value.deleted {
+    color: #b5838d;
+}
+
+.content {
+    animation: fadeIn 0.2s ease;
+}
+
+.info.deleted {
+    background: #f7f7f7;
+    color: #8d8d8d;
+}
+
+.info.deleted .value {
+    color: #8d8d8d;
+}
+
+/* Кнопки */
+.search-base-btn,
+.add-base-btn {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.search-base-btn {
+    background: #6d6875;
+    color: white;
+    border: none;
+}
+
+.search-base-btn:hover {
+    background: #5a5560;
+}
+
+.add-base-btn {
+    background: #83b583;
+    color: white;
+    border: none;
+}
+
+.add-base-btn:hover {
+    background: #75a575;
+}
