@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
+    ports:
+      - "${PGPORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - default
+
+  api:
+    build:
+      context: ./api
+      dockerfile: ../containers/api/Dockerfile
+    container_name: api
+    env_file:
+      - .env
+    environment:
+      ORIGIN: ${ORIGIN}
+    ports:
+      - "${NESTPORT}:3000"
+    depends_on:
+      - db
+    networks:
+      - default
+
+  app:
+    build:
+      context: ./app
+      dockerfile: ../containers/app/Dockerfile
+    container_name: app
+    env_file:
+      - .env
+    environment:
+      API: ${API}
+    ports:
+      - "${VUEPORT}:8000"
+    depends_on:
+      - api
+    networks:
+      - default
+
+volumes:
+  pgdata:
+
+networks:
+  default:
