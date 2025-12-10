@@ -9,6 +9,7 @@ import { EmployeeModule } from './employee/employee.module';
 import { PersonnelOperationModule } from './personnel_operation/personnel_operation.module';
 import { FileModule } from './file/file.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { UserModule } from './user/user.module';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { MulterModule } from '@nestjs/platform-express';
         EmployeeModule,
         PersonnelOperationModule,
         FileModule,
+        UserModule,
     ],
 })
 export class AppModule {}
