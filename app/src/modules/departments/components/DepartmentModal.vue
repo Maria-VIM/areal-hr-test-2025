@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const store = useDepartmentStore();
 const isLoading = ref(false);
+const errors = ref<{ name?: string; comment?: string }>({});
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -40,11 +41,22 @@ watch(
   { immediate: true },
 );
 
-async function saveDepartment() {
-  if (!form.value.name.trim()) {
-    alert('Please enter department name');
-    return;
+function validate() {
+  errors.value = {};
+  let isValid = true;
+  if (!form.value.name.trim() || form.value.name.length < 2) {
+    errors.value.name = 'Пожалуйста, введите корректное название (минимум 2 символа)';
+    isValid = false;
   }
+  if (!form.value.comment.trim() || form.value.comment.length < 5) {
+    errors.value.comment = 'Комментарий должен содержать минимум 5 символов';
+    isValid = false;
+  }
+  return isValid;
+}
+
+async function handleSubmit() {
+  if (!validate()) return;
   if (props.IsEdit && props.id) {
     const updateData = {
       name: form.value.name,
@@ -65,6 +77,7 @@ onMounted(() => {
 });
 
 function cancel() {
+  errors.value = {};
   emit('close');
 }
 
@@ -97,16 +110,24 @@ async function loadDepartment(id: number) {
       <h3>{{ IsEdit ? 'Редактирование отдела' : 'Создание отдела' }}</h3>
       <div v-if="!isLoading" class="form-content">
         <div class="form-fields">
-          <TBoxBase v-model="form.name" placeholder="Название отдела" class="input-field" />
+          <TBoxBase
+            v-model="form.name"
+            placeholder="Название отдела"
+            class="input-field"
+            :class="{ 'input-error': errors.name }"
+          />
+          <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
           <TAreaBase
             v-model="form.comment"
             placeholder="Комментарий к отделу"
             class="input-field"
+            :class="{ 'input-error': errors.comment }"
           />
+          <div v-if="errors.comment" class="error-message">{{ errors.comment }}</div>
         </div>
         <div class="buttons">
           <BtnBase
-            @click="saveDepartment"
+            @click="handleSubmit"
             :content="IsEdit ? 'Сохранить' : 'Создать'"
             :disabled="isLoading"
           />
@@ -118,4 +139,8 @@ async function loadDepartment(id: number) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.input-error {
+  border: 1px solid #731919;
+}
+</style>

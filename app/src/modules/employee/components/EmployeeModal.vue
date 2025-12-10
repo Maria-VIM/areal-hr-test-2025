@@ -27,6 +27,81 @@ const form = ref<EmployeeForm>({
   registration_address: '',
 });
 
+const errors = ref<{
+  first_name?: string;
+  last_name?: string;
+  middle_name?: string;
+  date_of_birth?: string;
+  passportSeries?: string;
+  passportNumber?: string;
+  passportIssuedBy?: string;
+  passportIssueDate?: string;
+  departmentCode?: string;
+  region?: string;
+  city?: string;
+  street?: string;
+  house?: string;
+}>({});
+
+function validate() {
+  errors.value = {};
+  let isValid = true;
+
+  if (!form.value.first_name.trim() || form.value.first_name.length < 3) {
+    errors.value.first_name = 'Имя не может быть пустым и должно быть больше двух символов';
+    isValid = false;
+  }
+  if (!form.value.last_name.trim() || form.value.last_name.length < 2) {
+    errors.value.last_name = 'Фамилия не может быть пустой и должно быть больше одного символа';
+    isValid = false;
+  }
+  if (!form.value.date_of_birth) {
+    errors.value.date_of_birth = 'Дата рождения не может быть пустой';
+    isValid = false;
+  }
+  if (!passportSeries.value.trim()) {
+    errors.value.passportSeries = 'Серия паспорта не может быть пустой';
+    isValid = false;
+  }
+  if (!passportNumber.value.trim() || !/^\d{6}$/.test(passportNumber.value)) {
+    errors.value.passportNumber = 'Номер паспорта не может быть пустым и должен содержать 6 цифр';
+    isValid = false;
+  }
+  if (!passportIssuedBy.value.trim()) {
+    errors.value.passportIssuedBy = 'Кем выдан паспорт не может быть пустым';
+    isValid = false;
+  }
+  if (!passportIssueDate.value) {
+    errors.value.passportIssueDate = 'Дата выдачи паспорта не может быть пустой';
+    isValid = false;
+  }
+  if (!departmentCode.value.trim()) {
+    errors.value.departmentCode = 'Код подразделения не может быть пустым';
+    isValid = false;
+  }
+  if (!region.value.trim()) {
+    errors.value.region = 'Регион не может быть пустым';
+    isValid = false;
+  }
+  if (!city.value.trim()) {
+    errors.value.city = 'Город не может быть пустым';
+    isValid = false;
+  }
+  if (!street.value.trim()) {
+    errors.value.street = 'Улица не может быть пустой';
+    isValid = false;
+  }
+  if (!house.value.trim()) {
+    errors.value.house = 'Номер дома не может быть пустым';
+    isValid = false;
+  }
+  if (!birthDateInput.value) {
+    errors.value.date_of_birth = 'Дата рождения не может быть пустой';
+    isValid = false;
+  }
+  return isValid;
+}
+
 const passportSeries = ref('');
 const passportNumber = ref('');
 const passportIssueDate = ref('');
@@ -64,11 +139,7 @@ const resetForm = () => {
 };
 
 const handleSubmit = () => {
-  if (!form.value.first_name.trim() || !form.value.last_name.trim()) {
-    alert('Пожалуйста, заполните обязательные поля: Имя и Фамилия');
-    return;
-  }
-
+  if (!validate()) return;
   form.value.passport_data = [
     passportSeries.value,
     passportNumber.value,
@@ -76,7 +147,6 @@ const handleSubmit = () => {
     passportIssuedBy.value,
     departmentCode.value,
   ].join(', ');
-
   const addressParts = [
     region.value,
     city.value && `г. ${city.value}`,
@@ -107,6 +177,7 @@ const handleSubmit = () => {
 const closeModal = () => {
   resetForm();
   isEdit.value = false;
+  errors.value = {};
   emit('close');
 };
 
@@ -224,68 +295,152 @@ watch(
 
       <div class="base-container">
         <div class="left-column">
-          <div class="input-field">
+          <div>
             <label>Имя:</label>
-            <TBoxBase v-model="form.first_name" placeholder="Введите имя" />
+            <TBoxBase
+              v-model="form.first_name"
+              placeholder="Введите имя"
+              class="input-field"
+              :class="{ 'input-error': errors.first_name }"
+            />
+            <div v-if="errors.first_name" class="error-message">{{ errors.first_name }}</div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Фамилия:</label>
-            <TBoxBase v-model="form.last_name" placeholder="Введите фамилию" />
+            <TBoxBase
+              v-model="form.last_name"
+              placeholder="Введите фамилию"
+              class="input-field"
+              :class="{ 'input-error': errors.last_name }"
+            />
+            <div v-if="errors.last_name" class="error-message">{{ errors.last_name }}</div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Отчество:</label>
-            <TBoxBase v-model="form.middle_name" placeholder="Введите отчество" />
+            <TBoxBase
+              v-model="form.middle_name"
+              placeholder="Введите отчество"
+              class="input-field"
+            />
           </div>
-          <div class="input-field">
+          <div>
             <label>Серия паспорта:</label>
-            <TBoxBase v-model="passportSeries" placeholder="1234" />
+            <TBoxBase
+              v-model="passportSeries"
+              placeholder="1234"
+              class="input-field"
+              :class="{ 'input-error': errors.passportSeries }"
+            />
+            <div v-if="errors.passportSeries" class="error-message">
+              {{ errors.passportSeries }}
+            </div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Номер паспорта:</label>
-            <TBoxBase v-model="passportNumber" placeholder="123456" />
+            <TBoxBase
+              v-model="passportNumber"
+              placeholder="123456"
+              class="input-field"
+              :class="{ 'input-error': errors.passportNumber }"
+            />
+            <div v-if="errors.passportNumber" class="error-message">
+              {{ errors.passportNumber }}
+            </div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Дата рождения:</label>
-            <DateBase v-model="birthDateInput" />
+            <DateBase
+              v-model="birthDateInput"
+              class="input-field"
+              :class="{ 'input-error': errors.date_of_birth }"
+            />
+            <div v-if="errors.date_of_birth" class="error-message">{{ errors.date_of_birth }}</div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Дата выдачи паспорта:</label>
-            <DateBase v-model="passportIssueDate" />
+            <DateBase
+              v-model="passportIssueDate"
+              class="input-field"
+              :class="{ 'input-error': errors.passportIssueDate }"
+            />
+            <div v-if="errors.passportIssueDate" class="error-message">
+              {{ errors.passportIssueDate }}
+            </div>
           </div>
         </div>
 
         <div class="right-column">
-          <div class="input-field">
+          <div>
             <label>Кем выдан паспорт:</label>
-            <TBoxBase v-model="passportIssuedBy" placeholder="ОВД района..." class="full-width" />
+            <TBoxBase
+              v-model="passportIssuedBy"
+              placeholder="ОВД района..."
+              class="input-field"
+              :class="{ 'input-error': errors.passportIssuedBy }"
+            />
+            <div v-if="errors.passportIssuedBy" class="error-message">
+              {{ errors.passportIssuedBy }}
+            </div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Код подразделения:</label>
-            <TBoxBase v-model="departmentCode" placeholder="123-456" />
+            <TBoxBase
+              v-model="departmentCode"
+              placeholder="123-456"
+              class="input-field"
+              :class="{ 'input-error': errors.departmentCode }"
+            />
+            <div v-if="errors.departmentCode" class="error-message">
+              {{ errors.departmentCode }}
+            </div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Область/Край:</label>
-            <TBoxBase v-model="region" placeholder="Московская область" />
+            <TBoxBase
+              v-model="region"
+              placeholder="Московская область"
+              class="input-field"
+              :class="{ 'input-error': errors.region }"
+            />
+            <div v-if="errors.region" class="error-message">{{ errors.region }}</div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Город/Населенный пункт:</label>
-            <TBoxBase v-model="city" placeholder="Москва" />
+            <TBoxBase
+              v-model="city"
+              placeholder="Москва"
+              class="input-field"
+              :class="{ 'input-error': errors.city }"
+            />
+            <div v-if="errors.city" class="error-message">{{ errors.city }}</div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Улица:</label>
-            <TBoxBase v-model="street" placeholder="Ленина" />
+            <TBoxBase
+              v-model="street"
+              placeholder="Ленина"
+              class="input-field"
+              :class="{ 'input-error': errors.street }"
+            />
+            <div v-if="errors.street" class="error-message">{{ errors.street }}</div>
           </div>
-          <div class="input-field">
+          <div>
             <label>Адрес:</label>
             <div class="address-row">
               <div class="address-item">
-                <TBoxBase v-model="house" placeholder="Дом" />
+                <TBoxBase
+                  v-model="house"
+                  placeholder="Дом"
+                  class="input-field"
+                  :class="{ 'input-error': errors.house }"
+                />
+                <div v-if="errors.house" class="error-message">{{ errors.house }}</div>
               </div>
               <div class="address-item">
-                <TBoxBase v-model="building" placeholder="Корпус" />
+                <TBoxBase v-model="building" placeholder="Корпус" class="input-field" />
               </div>
               <div class="address-item">
-                <TBoxBase v-model="apartment" placeholder="Квартира" />
+                <TBoxBase v-model="apartment" placeholder="Квартира" class="input-field" />
               </div>
             </div>
           </div>
@@ -319,11 +474,7 @@ watch(
   flex-direction: column;
 }
 
-.input-field {
-  margin-bottom: 20px;
-}
-
-.input-field label {
+label {
   display: block;
   margin-bottom: 6px;
   font-size: 14px;
@@ -340,10 +491,6 @@ watch(
   flex: 1;
 }
 
-.full-width {
-  width: 100%;
-}
-
 .buttons {
   display: flex;
   gap: 12px;
@@ -351,5 +498,9 @@ watch(
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid #e8e8e8;
+}
+
+.input-error {
+  border: 1px solid #731919;
 }
 </style>

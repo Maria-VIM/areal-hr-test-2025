@@ -17,6 +17,7 @@ const fileStore = useFileStore();
 const selectedFile = ref<File | null>(null);
 const fileName = ref('');
 const customName = ref('');
+const errors = ref<{ name?: string }>({});
 const loadFiles = async () => {
   if (props.employeeId) {
     await fileStore.fetchFiles(props.employeeId);
@@ -40,12 +41,19 @@ function handleFileSelect(event: Event) {
   fileName.value = file.name;
 }
 
+function validate() {
+  errors.value = {};
+  let isValid = true;
+  if (!customName.value.trim() || customName.value.length < 3) {
+    errors.value.name = 'Пожалуйста, введите корректное название для файла (минимум 3 символа)';
+    isValid = false;
+  }
+  return isValid;
+}
+
 const handleUpload = async () => {
   if (!selectedFile.value) return;
-  if (!customName.value.trim()) {
-    alert('Введите имя файла перед загрузкой');
-    return;
-  }
+  if (!validate()) return;
   const formData = new FormData();
   formData.append('file', selectedFile.value);
   formData.append('name', customName.value.trim());
@@ -67,6 +75,7 @@ const handleDelete = async (file: any) => {
   }
 };
 const closeModal = () => {
+  errors.value = {};
   emit('close');
 };
 </script>
@@ -79,7 +88,13 @@ const closeModal = () => {
         <input type="file" @change="handleFileSelect" accept="application/pdf" />
         <span v-if="fileName">{{ fileName }}</span>
       </div>
-      <TBoxBase v-model="customName" placeholder="Введите имя файла" />
+      <TBoxBase
+        v-model="customName"
+        placeholder="Введите имя файла"
+        class="input-field"
+        :class="{ 'input-error': errors.name }"
+      />
+      <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
       <BtnBase
         content="Загрузить"
         @click="handleUpload"
@@ -95,9 +110,6 @@ const closeModal = () => {
             <BtnIcon @click="handleDelete(file)" class="pi pi-eraser" />
           </div>
         </div>
-        <div class="placeholder" v-if="fileStore.files.length === 0 && !fileStore.loading">
-          Файлы не найдены
-        </div>
       </div>
       <div class="buttons">
         <BtnBase content="Отмена" @click="closeModal" />
@@ -106,4 +118,8 @@ const closeModal = () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.input-error {
+  border: 1px solid #731919;
+}
+</style>

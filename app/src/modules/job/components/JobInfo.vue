@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useJobStore } from '@/modules/job/store';
 import { useGeneralStore } from '@/store';
 import type { Job } from '@/modules/job/types/Job.ts';

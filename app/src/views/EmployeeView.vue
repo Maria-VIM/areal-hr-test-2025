@@ -9,7 +9,6 @@ import { EmployeeList, EmployeeModal } from '@/modules/employee';
 import BtnIcon from '@/components/BtnIcon.vue';
 import TBoxSearch from '@/components/TBoxSearch.vue';
 import { PersonnelList } from '@/modules/personnel';
-import { FileManager } from '@/modules/files/components';
 
 const selectedOption = ref<string | null>(null);
 const selectedOrgId = ref<number | null>(null);
@@ -147,7 +146,6 @@ function openModal() {
         <personnel-list :employee_id="selectedEmployeeId" />
       </div>
     </div>
-    <file-manager :employee-id="1" />
     <employee-modal :visible="showModal" @close="showModal = false" />
   </div>
 </template>

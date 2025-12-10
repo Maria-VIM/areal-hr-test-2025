@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits, watch, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useJobStore } from '@/modules/job/store';
 import DropdownSearch from '@/components/DropdownSearch.vue';
 

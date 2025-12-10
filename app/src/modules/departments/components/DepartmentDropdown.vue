@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, defineEmits, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useDepartmentStore } from '@/modules/departments/store';
 import DropdownSearch from '@/components/DropdownSearch.vue';
 import type { DropdownOption } from '@/shared/types/Option.ts';

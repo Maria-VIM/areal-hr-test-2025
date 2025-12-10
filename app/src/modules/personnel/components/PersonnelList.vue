@@ -78,11 +78,11 @@ watch(
         </div>
       </div>
       <div v-else class="placeholder">
-        <p>No operations found</p>
+        <p>Не найдено кадровых операций</p>
       </div>
     </div>
     <div v-else class="placeholder">
-      <p>Search empty</p>
+      <p>Не выбран сотрудник</p>
     </div>
   </div>
 </template>

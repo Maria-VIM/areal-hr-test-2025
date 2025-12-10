@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineProps } from 'vue';
+import { ref, watch } from 'vue';
 import { useOrganizationStore } from '../store';
 import { useGeneralStore } from '@/store';
 import type { Organization } from '../types/Organization.ts';

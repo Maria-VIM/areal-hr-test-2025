@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, ref, computed, defineEmits, watchEffect } from 'vue';
+import { ref, computed, watchEffect } from 'vue';
 import DepartmentTree from '@/modules/departments/components/DepartmentTree.vue';
 import BtnIcon from '@/components/BtnIcon.vue';
 import DepartmentInfo from '@/modules/departments/components/DepartmentInfo.vue';
@@ -17,8 +17,8 @@ const isVisible = ref(false);
 const hasChildren = computed(
   () => props.department.children && props.department.children.length > 0,
 );
-const isDeleted = computed(() => !!props.isDeleted);
-const isParentDeleted = computed(() => !!props.isParentDeleted);
+const isDeleted = computed(() => props.isDeleted);
+const isParentDeleted = computed(() => props.isParentDeleted);
 
 function toggleInfo() {
   isVisible.value = !isVisible.value;

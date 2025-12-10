@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, ref, defineProps, computed } from 'vue';
+import { watch, ref, computed } from 'vue';
 import { useEmployeesStore } from '@/modules/employee/store';
 import BtnIcon from '@/components/BtnIcon.vue';
 import EmployeeModal from '@/modules/employee/components/EmployeeModal.vue';

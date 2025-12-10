@@ -18,6 +18,7 @@ const emit = defineEmits<{
 const store = useOrganizationStore();
 const form = ref<OrganizationForm>({ name: '', comment: '' });
 const isEdit = ref(false);
+const errors = ref<{ name?: string; comment?: string }>({});
 
 async function loadOrganization(id: number) {
   await store.getOrganizationById(id);
@@ -28,15 +29,24 @@ async function loadOrganization(id: number) {
     };
   }
 }
+
+function validate() {
+  errors.value = {};
+  let isValid = true;
+  if (!form.value.name.trim() || form.value.name.length < 2) {
+    errors.value.name = 'Пожалуйста, введите корректное название (минимум 2 символа)';
+    isValid = false;
+  }
+  if (!form.value.comment.trim() || form.value.comment.length < 5) {
+    errors.value.comment = 'Комментарий должен содержать минимум 5 символов';
+    isValid = false;
+  }
+  return isValid;
+}
+
 async function handleSubmit() {
+  if (!validate()) return;
   try {
-    if (!form.value.name.trim() || form.value.name.length < 3) {
-      alert('Пожалуста введите корректное значение для названия');
-      return;
-    } else if (!form.value.comment.trim() || form.value.comment.length < 5) {
-      alert('Пожалуста введите корректное значение для комментария');
-      return;
-    }
     if (isEdit.value && props.id != null) {
       await store.updateOrganization(props.id, form.value);
     } else {
@@ -47,8 +57,10 @@ async function handleSubmit() {
     console.error('Ошибка при попытке выполнить действие:', error);
   }
 }
+
 function closeModal() {
   form.value = { name: '', comment: '' };
+  errors.value = {};
   emit('close');
 }
 
@@ -71,8 +83,22 @@ watch(
   <div v-if="visible" class="modal">
     <div class="modal-content">
       <h3>{{ isEdit ? 'Редактировать организацию' : 'Создать организацию' }}</h3>
-      <TBoxBase v-model="form.name" placeholder="Organization name" class="input-field" />
-      <TAreaBase v-model="form.comment" placeholder="Organization comment" class="input-field" />
+      <TBoxBase
+        v-model="form.name"
+        :placeholder="'Наименование организации'"
+        class="input-field"
+        :class="{'input-error': errors.name }"
+      />
+      <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
+
+      <TAreaBase
+        v-model="form.comment"
+        :placeholder="'Комментарий к организации'"
+        class="input-field"
+        :class="{'input-error': errors.comment}"
+      />
+      <div v-if="errors.comment" class="error-message">{{ errors.comment }}</div>
+
       <div class="buttons">
         <BtnBase @click="handleSubmit" :content="isEdit ? 'Изменить' : 'Добавить'" />
         <BtnBase @click="closeModal" content="Отмена" />
@@ -81,4 +107,9 @@ watch(
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.input-error {
+  border: 1px solid #731919;
+}
+</style>
+

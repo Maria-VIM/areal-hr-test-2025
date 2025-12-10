@@ -267,3 +267,11 @@ h4 {
 .add-base-btn:hover {
     background: #75a575;
 }
+
+
+.error-message {
+    color: #731919;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 5px;
+}

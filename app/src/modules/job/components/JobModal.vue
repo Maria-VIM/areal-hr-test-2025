@@ -2,7 +2,13 @@
   <div v-if="visible" class="modal">
     <div class="modal-content">
       <h3>{{ isEdit ? 'Редактировать должность' : 'Создать должность' }}</h3>
-      <TBoxBase v-model="form.name" placeholder="Job title" />
+      <TBoxBase
+        v-model="form.name"
+        placeholder="Наименование должности"
+        class="input-field"
+        :class="{ 'input-error': errors.name }"
+      />
+      <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
       <div class="buttons">
         <BtnBase @click="handleSubmit" :content="isEdit ? 'Изменить' : 'Добавить'" />
         <BtnBase @click="closeModal" content="Отмена" />
@@ -31,6 +37,7 @@ const emit = defineEmits<{
 const store = useJobStore();
 const form = ref<JobForm>({ name: '' });
 const isEdit = ref(false);
+const errors = ref<{ name?: string }>({});
 
 async function loadJobs(id: number) {
   await store.getJobById(id);
@@ -39,6 +46,16 @@ async function loadJobs(id: number) {
       name: store.job.name || '',
     };
   }
+}
+
+function validate() {
+  errors.value = {};
+  let isValid = true;
+  if (!form.value.name.trim() || form.value.name.length < 3) {
+    errors.value.name = 'Пожалуйста, введите корректное название должности (минимум 3 символа)';
+    isValid = false;
+  }
+  return isValid;
 }
 watch(
   () => props.id,
@@ -56,11 +73,7 @@ watch(
 
 async function handleSubmit() {
   try {
-    const name = form.value.name.trim();
-    if (name.length < 3) {
-      alert('Пожалуйста, введите корректное значение для названия');
-      return;
-    }
+    if (!validate()) return;
     if (isEdit.value && props.id != null) {
       await store.updateJob(props.id, form.value);
     } else {
@@ -75,8 +88,13 @@ async function handleSubmit() {
 
 function closeModal() {
   form.value = { name: '' };
+  errors.value = {};
   emit('close');
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.input-error {
+  border: 1px solid #731919;
+}
+</style>

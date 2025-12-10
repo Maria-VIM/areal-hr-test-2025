@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
 
-defineProps<{ modelValue: string | number }>();
+defineProps<{ modelValue: string | number}>();
 const emit = defineEmits(['update:modelValue']);
 
 function onInput(e: Event) {
@@ -11,7 +10,7 @@ function onInput(e: Event) {
 </script>
 
 <template>
-  <input class="tbox-base" :value="modelValue" @input="onInput" />
+  <input type="text" class="tbox-base" :value="modelValue" @input="onInput" />
 </template>
 
 <style scoped>
