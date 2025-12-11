@@ -7,20 +7,36 @@ export const useJobStore = defineStore('job', {
     loading: false,
     jobs: [] as Job[],
     job: null as Job | null,
+    totalJobs: 0,
+    totalPages: 0,
     version: 0,
   }),
   actions: {
     incrementVersion() {
       this.version++;
     },
-    async fetchJobs(): Promise<void> {
+    async fetchAllJobs(page: number, size: number): Promise<void> {
       try {
         this.loading = true;
-        const response = await jobApi.getAllJobs();
-        this.jobs = response.data;
+        const response = await jobApi.getAll(page, size);
+        this.jobs = response.data.jobs.sort((a: any, b: any) => a.id - b.id);
+        this.totalJobs = response.data.totalCount;
+        this.totalPages = response.data.totalPages;
       } catch (error) {
         console.error(error);
         alert('Cannot get job');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchActiveJobs(): Promise<void> {
+      try {
+        this.loading = true;
+        const response = await jobApi.getAllActiveJobs();
+        this.jobs = response.data;
+      } catch (error) {
+        console.error(error);
+        alert('Cannot get active job');
       } finally {
         this.loading = false;
       }
@@ -39,11 +55,13 @@ export const useJobStore = defineStore('job', {
         this.loading = false;
       }
     },
-    async getJobByName(name: string): Promise<void> {
+    async getJobByName(name: string, page: number, size: number): Promise<void> {
       try {
         this.loading = true;
-        const response = await jobApi.getByName(name);
-        this.jobs = response.data.sort((a: any, b: any) => a.id - b.id);
+        const response = await jobApi.getByName(name, page, size);
+        this.jobs = response.data.jobs.sort((a: any, b: any) => a.id - b.id);
+        this.totalJobs = response.data.totalCount;
+        this.totalPages = response.data.totalPages;
       } catch (error) {
         console.error(error);
         alert('Cannot get jobs by name');

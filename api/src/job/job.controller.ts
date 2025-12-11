@@ -7,6 +7,7 @@ import {
     Param,
     Patch,
     Post,
+    Query,
 } from '@nestjs/common';
 import { JobService } from './job.service';
 import { Job } from './entities/entity-job';
@@ -19,6 +20,13 @@ import { updateJobSchema } from './schemas/update-job.schema';
 export class JobController {
     constructor(private readonly jobService: JobService) {}
     @Get()
+    async findAll(
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize: number = 10,
+    ): Promise<any> {
+        return await this.jobService.findAll(page, pageSize);
+    }
+    @Get('active')
     findAllActive(): Promise<Job[]> {
         return this.jobService.findAllActive();
     }
@@ -27,8 +35,12 @@ export class JobController {
         return this.jobService.findOneById(id);
     }
     @Get('name/:name')
-    findByName(@Param('name') name: string): Promise<Job[]> {
-        return this.jobService.findByName(name);
+    async findByName(
+        @Param('name') name: string,
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize: number = 10,
+    ): Promise<any> {
+        return await this.jobService.findByName(name, page, pageSize);
     }
     @Delete(':id')
     delete(@Param('id') id: number): Promise<Job> {

@@ -8,6 +8,24 @@ import { UpdateJobDto } from './dto/update-job.dto';
 @Injectable()
 export class JobService {
     constructor(private dbService: DbService) {}
+    async findAll(page: number = 1, pageSize: number = 10): Promise<any> {
+        const offset = (page - 1) * pageSize;
+        const countResult = await this.dbService.query(
+            `SELECT COUNT(*) FROM "Job_title"`,
+        );
+        const totalCount = parseInt(countResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalCount / pageSize);
+        const result = await this.dbService.query(
+            `SELECT id, name, deleted_at FROM "Job_title" LIMIT $1 OFFSET $2`,
+            [pageSize, offset],
+        );
+        return {
+            jobs: result.rows,
+            totalPages: totalPages,
+            totalCount: totalCount,
+        };
+    }
+
     async findAllActive(): Promise<Job[]> {
         const result: QueryResult = await this.dbService.query(
             `SELECT id, name, deleted_at FROM "Job_title"
@@ -22,12 +40,28 @@ export class JobService {
         );
         return result.rows[0];
     }
-    async findByName(name: string): Promise<Job[]> {
-        const result: QueryResult = await this.dbService.query(
-            `SELECT id, name, deleted_at FROM "Job_title" WHERE name ILIKE $1`,
+    async findByName(
+        name: string,
+        page: number = 1,
+        pageSize: number = 10,
+    ): Promise<any> {
+        const offset = (page - 1) * pageSize;
+        const countResult = await this.dbService.query(
+            `SELECT COUNT(*) FROM "Job_title" WHERE name ILIKE $1`,
             [`%${name}%`],
         );
-        return result.rows;
+        const totalCount = parseInt(countResult.rows[0].count, 10);
+        const totalPages = Math.ceil(totalCount / pageSize);
+        const result: QueryResult = await this.dbService.query(
+            `SELECT id, name, deleted_at FROM "Job_title" WHERE name ILIKE $1
+                LIMIT $2 OFFSET $3`,
+            [`%${name}%`, pageSize, offset],
+        );
+        return {
+            jobs: result.rows,
+            totalPages: totalPages,
+            totalCount: totalCount,
+        };
     }
     async delete(id: number): Promise<Job> {
         try {

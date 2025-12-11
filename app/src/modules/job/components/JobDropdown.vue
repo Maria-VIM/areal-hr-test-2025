@@ -2,11 +2,7 @@
 import { ref, watch, onMounted } from 'vue';
 import { useJobStore } from '@/modules/job/store';
 import DropdownSearch from '@/components/DropdownSearch.vue';
-
-interface DropdownOption {
-  value: number;
-  label: string;
-}
+import type { DropdownOption } from '@/shared/types/Option.ts';
 
 interface Props {
   modelValue?: number | null;
@@ -25,7 +21,7 @@ const jobOptions = ref<DropdownOption[]>([]);
 const selectedJob = ref<DropdownOption | null>(null);
 
 onMounted(async () => {
-  await store.fetchJobs();
+  await store.fetchActiveJobs();
   jobOptions.value = store.jobs.map((job: any) => ({
     value: job.id,
     label: job.name,
