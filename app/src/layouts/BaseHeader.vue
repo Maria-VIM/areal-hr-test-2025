@@ -16,7 +16,6 @@ const isActive = (path: string) => route.path === path;
   <header>
     <nav>
       <div class="nav-brand">HR App</div>
-
       <ul class="nav-list">
         <li>
           <BtnBase
@@ -40,6 +39,14 @@ const isActive = (path: string) => route.path === path;
             :class="{ active: isActive('/employees') }"
             @click="navigateTo('/employees')"
             content="Работники"
+          />
+        </li>
+        <li>
+          <BtnBase
+            class="nav-link"
+            :class="{ active: isActive('/users') }"
+            @click="navigateTo('/users')"
+            content="Пользователи"
           />
         </li>
       </ul>

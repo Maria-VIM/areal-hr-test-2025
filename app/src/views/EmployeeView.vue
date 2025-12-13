@@ -18,31 +18,29 @@ const selectedEmployeeId = ref<number>();
 const showModal = ref(false);
 
 const searchParams = ref({
-  orgId: null as number | null,
-  deptId: null as number | null,
-  option: null as string | null,
-  nameQuery: null as string | null,
+  orgId: undefined as number | undefined,
+  deptId: undefined as number | undefined,
+  option: undefined as string | undefined,
+  nameQuery: undefined as string | undefined,
 });
 
 const onOrgSelected = (orgId: number | null) => {
   selectedOrgId.value = orgId;
-  selectedDeptId.value = null;
-  searchQuery.value = null;
-  selectedOption.value = null;
+  if (selectedOption.value === 'trainees') {
+    selectedOption.value = null;
+  }
 };
 
 const onDeptSelected = (deptId: number | null) => {
   selectedDeptId.value = deptId;
-  searchQuery.value = null;
-  selectedOption.value = null;
+  if (selectedOption.value === 'trainees') {
+    selectedOption.value = null;
+  }
 };
 
 const onSearch = (nameQuery: string | null) => {
   searchQuery.value = nameQuery;
   if (nameQuery && nameQuery.trim().length > 0) {
-    selectedOption.value = null;
-    selectedOrgId.value = null;
-    selectedDeptId.value = null;
   } else if (nameQuery === null || nameQuery.trim() === '') {
     searchQuery.value = null;
   }
@@ -50,8 +48,7 @@ const onSearch = (nameQuery: string | null) => {
 
 const onOptionSelected = (option: string | null) => {
   selectedOption.value = option;
-  if (option !== null) {
-    searchQuery.value = null;
+  if (option === 'trainees') {
     selectedOrgId.value = null;
     selectedDeptId.value = null;
   }
@@ -63,16 +60,18 @@ function onEmployeeSelected(employeeId: number) {
 
 const eraseSelectedDeptId = () => {
   selectedDeptId.value = null;
-  searchQuery.value = null;
-  selectedOption.value = null;
+};
+
+const eraseSelectedOrgId = () => {
+  selectedOrgId.value = null;
 };
 
 const handleSearch = () => {
   searchParams.value = {
-    orgId: selectedOrgId.value || null,
-    deptId: selectedDeptId.value || null,
-    option: selectedOption.value || null,
-    nameQuery: searchQuery.value?.trim() || null,
+    orgId: selectedOrgId.value || undefined,
+    deptId: selectedDeptId.value || undefined,
+    option: selectedOption.value || undefined,
+    nameQuery: searchQuery.value?.trim() || undefined,
   };
 };
 const employeeParams = computed(() => searchParams.value);
@@ -93,12 +92,20 @@ function openModal() {
             placeholder="Поиск по имени и фамилии"
             :value="searchQuery"
           />
-          <organization-dropdown
-            :model-value="selectedOrgId"
-            @update:model-value="onOrgSelected"
-            placeholder="Выберите организацию"
-          />
-          <div class="dept-combined">
+          <div class="combined">
+            <organization-dropdown
+              :model-value="selectedOrgId"
+              @update:model-value="onOrgSelected"
+              placeholder="Выберите организацию"
+            />
+            <BtnIcon
+              v-if="selectedOrgId"
+              class="pi pi-delete-left clear-btn-inline"
+              @click="eraseSelectedOrgId"
+              title="Очистить отдел"
+            />
+          </div>
+          <div class="combined">
             <department-dropdown
               v-if="selectedOrgId"
               :key="`dept-${selectedOrgId}-${selectedDeptId || 'null'}`"
@@ -115,6 +122,13 @@ function openModal() {
             />
           </div>
           <div class="radio-group">
+            <radio-btn
+              text="Все"
+              aria-checked="true"
+              value="all"
+              :model-value="selectedOption || 'all'"
+              @update:model-value="onOptionSelected"
+            />
             <radio-btn
               text="Стажеры"
               value="trainees"
@@ -180,7 +194,7 @@ function openModal() {
   flex-shrink: 0;
 }
 
-.dept-combined {
+.combined {
   position: relative;
   display: inline-block;
 }

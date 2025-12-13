@@ -1,8 +1,8 @@
 import apiClient from './apiClient';
 
 export const api = {
-  get(url: string, params?: Record<string, any>) {
-    return apiClient.get(url, { params });
+  get(url: string, config?: any) {
+    return apiClient.get(url, config);
   },
   post(url: string, data: any, config?: any) {
     return apiClient.post(url, data, config);

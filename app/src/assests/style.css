@@ -64,6 +64,14 @@ body {
     background: #bdbdbd;
 }
 
+.row.deactivation {
+    background: #e5bdbd;
+}
+
+.row.activation {
+    background: #c0e5bd;
+}
+
 .name {
     font-weight: 400;
     cursor: pointer;

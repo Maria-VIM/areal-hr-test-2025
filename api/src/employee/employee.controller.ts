@@ -7,6 +7,7 @@ import {
     Param,
     Patch,
     Post,
+    Query,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { Employee } from './entities/entity-employeee';
@@ -14,39 +15,48 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { createEmployeeSchema } from './schemas/create-employee.schema';
 import { updateEmployeeSchema } from './schemas/update-employee.schema';
-
 @Controller('employee')
 export class EmployeeController {
     constructor(private readonly employeeService: EmployeeService) {}
-    @Get('/organization/:organization_id')
-    getAllByOrganization(
-        @Param('organization_id') organization_id: number,
-    ): Promise<Employee[]> {
-        return this.employeeService.findAllActiveByOrganization(
+    @Get('')
+    getAll(
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize: number = 10,
+        @Query('organization_id') organization_id?: number,
+        @Query('department_id') department_id?: number,
+        @Query('name') name?: string,
+        @Query('is_deleted') is_deleted?: boolean,
+    ): Promise<{
+        employees: Employee[];
+        totalPages: number;
+        totalCount: number;
+    }> {
+        return this.employeeService.findAll(
+            page,
+            pageSize,
             organization_id,
+            department_id,
+            name,
+            is_deleted,
         );
     }
 
-    @Get('/department/:department_id')
-    getAllByDepartment(
-        @Param('department_id') department_id: number,
-    ): Promise<Employee[]> {
-        return this.employeeService.findAllActiveByDepartment(department_id);
-    }
-
-    @Get('/deleted')
-    getAllDeleted(): Promise<Employee[]> {
-        return this.employeeService.findDeleted();
-    }
-
     @Get('/trainees')
-    getAllTrainees(): Promise<Employee[]> {
-        return this.employeeService.findTrainees();
+    getAllTrainees(
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize: number = 10,
+        @Query('name') name?: string,
+    ): Promise<{
+        employees: Employee[];
+        totalPages: number;
+        totalCount: number;
+    }> {
+        return this.employeeService.findTrainees(page, pageSize, name);
     }
 
-    @Get('/name/:name')
-    getByName(@Param('name') name: string): Promise<Employee[]> {
-        return this.employeeService.findAllByName(name);
+    @Get('/active')
+    getAllActive(): Promise<Employee[]> {
+        return this.employeeService.findAllActive();
     }
 
     @Get('/id/:id')

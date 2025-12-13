@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUserSchema } from './schemas/create-user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserSchema } from './schemas/update-user.schema';
+import { Roles } from './entity/entity-role';
 
 @Controller('user')
 export class UserController {
@@ -21,6 +22,10 @@ export class UserController {
     @Get('')
     getAll(): Promise<Users[]> {
         return this.userService.findAll();
+    }
+    @Get('roles')
+    getAllJob(): Promise<Roles[]> {
+        return this.userService.findAllRoles();
     }
     @Get('id/:id')
     getById(@Param('id') id: number): Promise<Users> {

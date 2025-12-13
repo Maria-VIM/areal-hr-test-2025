@@ -8,73 +8,61 @@ export const useEmployeesStore = defineStore('employee', {
     loading: true,
     employees: [] as Employee[],
     employee: null as Employee | null,
+    totalEmployee: 0,
+    totalPages: 0,
     version: 0,
   }),
   actions: {
     incrementVersion() {
       this.version++;
     },
-    async fetchEmployeesByOrganization(organization_id: number): Promise<void> {
+    async fetchEmployees(params: {
+      organization_id?: number;
+      department_id?: number;
+      name?: string;
+      is_deleted?: boolean;
+      page?: number;
+      pageSize?: number;
+    }): Promise<void> {
       try {
         this.loading = true;
-        const response = await employeeApi.getAllByOrganization(organization_id);
-        this.employees = response.data.sort((a: any, b: any) => a.id - b.id);
-        return response.data;
+        const response = await employeeApi.getAll(params);
+        this.employees = response.data.employees.sort((a: any, b: any) => a.id - b.id);
+        this.totalPages = response.data.totalPages;
+        this.totalEmployee = response.data.totalCount;
       } catch (error) {
         console.log(error);
-        alert('Cannot load employees by organization');
+        alert('Cannot load employees');
       } finally {
         this.loading = false;
       }
     },
-    async fetchEmployeeByDepartment(department_id: number): Promise<void> {
+    async fetchActive(): Promise<void> {
       try {
         this.loading = true;
-        const response = await employeeApi.getAllByDepartment(department_id);
+        const response = await employeeApi.getAllActive();
         this.employees = response.data.sort((a: any, b: any) => a.id - b.id);
-        return response.data;
       } catch (error) {
         console.log(error);
-        alert('Cannot load employees by department');
+        alert('Cannot load active employees');
       } finally {
         this.loading = false;
       }
     },
-    async fetchTrainees(): Promise<void> {
+    async fetchTrainees(params?: {
+      name?: string;
+      page?: number;
+      pageSize?: number;
+    }): Promise<void> {
       try {
         this.loading = true;
-        const response = await employeeApi.getTrainees();
-        this.employees = response.data.sort((a: any, b: any) => a.id - b.id);
-        return response.data;
+        const response = await employeeApi.getTrainees(params || {});
+        this.employees = response.data.employees.sort((a: any, b: any) => a.id - b.id);
+        this.totalPages = response.data.totalPages;
+        this.totalEmployee = response.data.totalCount;
       } catch (error) {
         console.log(error);
         alert('Cannot load trainees');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async fetchEmployeeByName(name: string): Promise<void> {
-      try {
-        this.loading = true;
-        const response = await employeeApi.getAllByName(name);
-        this.employees = response.data.sort((a: any, b: any) => a.id - b.id);
-        return response.data;
-      } catch (error) {
-        console.log(error);
-        alert('Cannot load employees by department');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async fetchDeletedEmployee(): Promise<void> {
-      try {
-        this.loading = true;
-        const response = await employeeApi.getDeleted();
-        this.employees = response.data.sort((a: any, b: any) => a.id - b.id);
-        return response.data;
-      } catch (error) {
-        console.log(error);
-        alert('Cannot load deleted employees');
       } finally {
         this.loading = false;
       }

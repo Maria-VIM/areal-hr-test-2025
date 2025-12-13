@@ -2,21 +2,23 @@ import { api } from '@/shared/api';
 import type { EmployeeForm } from '@/modules/employee/types/EmployeeForm.ts';
 
 export const employeeApi = {
-  getAllByOrganization(organization_id: number) {
-    return api.get(`/employee/organization/${organization_id}`);
+  getAll(params: {
+    page?: number;
+    pageSize?: number;
+    organization_id?: number;
+    department_id?: number;
+    name?: string;
+    is_deleted?: boolean;
+  }) {
+    return api.get('/employee', { params });
   },
-  getAllByDepartment(department_id: number) {
-    return api.get(`/employee/department/${department_id}`);
+  getTrainees(params: { page?: number; pageSize?: number; name?: string }) {
+    return api.get('/employee/trainees', { params });
   },
-  getDeleted() {
-    return api.get(`/employee/deleted`);
+  getAllActive() {
+    return api.get('/employee/active');
   },
-  getTrainees() {
-    return api.get(`/employee/trainees`);
-  },
-  getAllByName(name: string) {
-    return api.get(`/employee/name/${name}`);
-  },
+
   getById(id: number) {
     return api.get(`/employee/id/${id}`);
   },

@@ -55,7 +55,8 @@ function validate() {
     errors.value.last_name = 'Фамилия не может быть пустой и должно быть больше одного символа';
     isValid = false;
   }
-  if (!form.value.date_of_birth) {
+  const birthDate = form.value.date_of_birth || birthDateInput.value;
+  if (!birthDate) {
     errors.value.date_of_birth = 'Дата рождения не может быть пустой';
     isValid = false;
   }
@@ -93,10 +94,6 @@ function validate() {
   }
   if (!house.value.trim()) {
     errors.value.house = 'Номер дома не может быть пустым';
-    isValid = false;
-  }
-  if (!birthDateInput.value) {
-    errors.value.date_of_birth = 'Дата рождения не может быть пустой';
     isValid = false;
   }
   return isValid;

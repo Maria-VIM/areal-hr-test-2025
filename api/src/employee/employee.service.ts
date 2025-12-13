@@ -8,72 +8,118 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 @Injectable()
 export class EmployeeService {
     constructor(private dbService: DbService) {}
-    async findAllActiveByOrganization(
-        organization_id: number,
-    ): Promise<Employee[]> {
+    async findAll(
+        page: number = 1,
+        pageSize: number = 10,
+        organization_id?: number,
+        department_id?: number,
+        name?: string,
+        is_deleted?: boolean,
+    ): Promise<{
+        employees: Employee[];
+        totalPages: number;
+        totalCount: number;
+    }> {
+        const offset = (page - 1) * pageSize;
+        const params: any[] = [];
+        const whereConditions: string[] = [];
+
+        const baseFrom = `
+        FROM "Employee" e
+        JOIN "Personnel_operation" po ON po.employee_id = e.id
+        JOIN "Department" d ON d.id = po.department_id
+        JOIN "Organization" o ON o.id = d.organization_id`;
+
+        if (department_id) {
+            whereConditions.push(`d.id = $${params.length + 1}`);
+            params.push(department_id);
+        } else if (organization_id) {
+            whereConditions.push(`o.id = $${params.length + 1}`);
+            params.push(organization_id);
+        }
+        if (is_deleted) {
+            whereConditions.push(`e.deleted_at IS NOT NULL`);
+        } else {
+            whereConditions.push(`e.deleted_at IS NULL`);
+        }
+        if (name) {
+            whereConditions.push(
+                `(e.first_name ILIKE $${params.length + 1} OR e.last_name ILIKE $${params.length + 1})`,
+            );
+            params.push(`%${name}%`);
+        }
+        const whereClause =
+            whereConditions.length > 0
+                ? `WHERE ${whereConditions.join(' AND ')}`
+                : '';
+        const countQuery = `SELECT COUNT(DISTINCT e.id) ${baseFrom} ${whereClause}`;
+        const countResult = await this.dbService.query(countQuery, params);
+        const totalCount = parseInt(countResult.rows[0].count, 10);
+        const mainQuery = `
+        SELECT e.id, e.first_name, e.last_name, e.middle_name, e.deleted_at,
+            JSON_AGG(
+                DISTINCT JSONB_BUILD_OBJECT(
+                    'organization_id', o.id,
+                    'department_id', d.id,
+                    'dismissal_date', po.dismissal_date
+                )
+            ) as organizations
+        ${baseFrom}
+        ${whereClause}
+        GROUP BY e.id
+        LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        const queryParams = [...params, pageSize, offset];
+        const result = await this.dbService.query(mainQuery, queryParams);
+        return {
+            employees: result.rows,
+            totalPages: Math.ceil(totalCount / pageSize),
+            totalCount: totalCount,
+        };
+    }
+
+    async findAllActive() {
         const query: QueryResult = await this.dbService.query(
-            `SELECT e.id, e.first_name, e.last_name, e.middle_name, e.deleted_at,
-                 JSON_AGG(
-                     DISTINCT JSONB_BUILD_OBJECT(
-                     'organization_id', o.id,
-                     'department_name', d.name,
-                     'dismissal_date', po.dismissal_date
-                     )
-                 ) as organizations
-             FROM "Employee" e
-                 JOIN "Personnel_operation" po ON po.employee_id = e.id
-                 JOIN "Department" d ON d.id = po.department_id
-                 JOIN "Organization" o ON o.id = d.organization_id
-             WHERE o.id = $1 AND dismissal_date IS NULL
-             GROUP BY e.id`,
-            [organization_id],
+            `SELECT *
+             FROM "Employee" WHERE deleted_at IS NULL`,
         );
         return query.rows;
     }
-    async findAllActiveByDepartment(
-        department_id: number,
-    ): Promise<Employee[]> {
-        const query: QueryResult = await this.dbService.query(
-            `SELECT e.id, e.first_name, e.last_name, e.middle_name, e.deleted_at,
-                 JSON_AGG(
-                     DISTINCT JSONB_BUILD_OBJECT(
-                     'department_id', d.id,
-                     'department_name', d.name,
-                     'dismissal_date', po.dismissal_date
-                     )
-                 ) as departments
-             FROM "Employee" e
-                 JOIN "Personnel_operation" po ON po.employee_id = e.id
-                 JOIN "Department" d ON d.id = po.department_id
-                 JOIN "Organization" o ON o.id = d.organization_id
-             WHERE d.id = $1 AND po.dismissal_date IS NULL
-             GROUP BY e.id`,
-            [department_id],
+
+    async findTrainees(
+        page: number,
+        pageSize: number,
+        name?: string,
+    ): Promise<{
+        employees: Employee[];
+        totalPages: number;
+        totalCount: number;
+    }> {
+        const offset = (page - 1) * pageSize;
+        const params: any[] = [];
+        let whereClause =
+            'WHERE e.deleted_at IS NULL AND e.id NOT IN ' +
+            '(SELECT employee_id FROM "Personnel_operation")';
+        if (name) {
+            whereClause += ` AND (e.first_name ILIKE $${params.length + 1} OR e.last_name ILIKE $${params.length + 1})`;
+            params.push(`%${name}%`);
+        }
+        const baseQuery = `SELECT e.id, e.first_name, e.last_name, e.middle_name FROM "Employee" e ${whereClause}`;
+        const countQuery = `SELECT COUNT(*) FROM "Employee" e ${whereClause}`;
+        const countResult = await this.dbService.query(countQuery, params);
+        const paginatedQuery = `${baseQuery} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        const paginatedParams = [...params, pageSize, offset];
+        const result = await this.dbService.query(
+            paginatedQuery,
+            paginatedParams,
         );
-        return query.rows;
+        const totalCount = parseInt(countResult.rows[0].count, 10);
+        return {
+            employees: result.rows,
+            totalPages: Math.ceil(totalCount / pageSize),
+            totalCount: totalCount,
+        };
     }
-    async findTrainees(): Promise<Employee[]> {
-        const query: QueryResult = await this.dbService.query(
-            `SELECT e.id, e.first_name, e.last_name, e.middle_name
-            FROM "Employee" e WHERE e.deleted_at IS NULL AND e.id NOT IN (select employee_id FROM "Personnel_operation")`,
-        );
-        return query.rows;
-    }
-    async findDeleted(): Promise<Employee[]> {
-        const query: QueryResult = await this.dbService.query(
-            `SELECT e.id, e.first_name, e.last_name, e.middle_name
-            FROM "Employee" e WHERE e.deleted_at IS NOT NULL`,
-        );
-        return query.rows;
-    }
-    async findAllByName(name: string): Promise<Employee[]> {
-        const query: QueryResult = await this.dbService.query(
-            `SELECT * FROM "Employee"
-            WHERE first_name LIKE $1 OR last_name LIKE $1`,
-            ['%' + name + '%'],
-        );
-        return query.rows;
-    }
+
     async findOneById(id: number): Promise<Employee> {
         const query: QueryResult = await this.dbService.query(
             `SELECT *
@@ -133,6 +179,7 @@ export class EmployeeService {
                 date_of_birth,
                 passport_data,
                 registration_address,
+                user_id,
             } = body;
 
             const query: QueryResult = await this.dbService.query(
@@ -142,8 +189,9 @@ export class EmployeeService {
                 middle_name = COALESCE($3, middle_name),
                 date_of_birth = COALESCE($4, date_of_birth),
                 passport_data = COALESCE($5, passport_data),
-                registration_address = COALESCE($6, registration_address)
-                 WHERE id = $7 RETURNING *`,
+                registration_address = COALESCE($6, registration_address),
+                user_id = COALESCE($8, user_id)
+                WHERE id = $7 RETURNING *`,
                 [
                     first_name,
                     last_name,
@@ -152,6 +200,7 @@ export class EmployeeService {
                     passport_data,
                     registration_address,
                     id,
+                    user_id,
                 ],
             );
             return query.rows[0];
