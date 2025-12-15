@@ -28,12 +28,21 @@ export class UserService {
     }
     async findOne(id: number): Promise<Users> {
         const result: QueryResult = await this.dbService.query(
-            `SELECT u.id, e.first_name || ' ' || e.last_name as full_name, r.id as role_id, r.name, login,
+            `SELECT u.id, r.id as role_id, r.name, login, password,
             is_active, u.deleted_at, u.created_at, u.updated_at
             FROM "User" u JOIN "Role" r ON u.role_id = r.id
             JOIN "Employee" e ON u.id = e.user_id
             WHERE u.id = $1`,
             [id],
+        );
+        return result.rows[0];
+    }
+    async findOneByLogin(login: string): Promise<Users> {
+        const result: QueryResult = await this.dbService.query(
+            `SELECT id, login, password
+            FROM "User"
+            WHERE login = $1`,
+            [login],
         );
         return result.rows[0];
     }

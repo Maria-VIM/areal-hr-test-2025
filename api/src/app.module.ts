@@ -10,6 +10,7 @@ import { PersonnelOperationModule } from './personnel_operation/personnel_operat
 import { FileModule } from './file/file.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { UserModule } from './user/user.module';
         PersonnelOperationModule,
         FileModule,
         UserModule,
+        AuthModule,
     ],
 })
 export class AppModule {}
