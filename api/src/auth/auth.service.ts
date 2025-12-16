@@ -9,7 +9,11 @@ export class AuthService {
     async validateUser(login: string, password: string) {
         const currentUser: AuthUser =
             await this.userService.findOneByLogin(login);
-        if (currentUser) {
+        if (
+            currentUser &&
+            currentUser.is_active &&
+            currentUser.deleted_at == null
+        ) {
             const isMatch: Promise<boolean> = argon2.verify(
                 currentUser.password,
                 password,

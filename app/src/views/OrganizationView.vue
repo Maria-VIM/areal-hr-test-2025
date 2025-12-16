@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { OrganizationInfo, OrganizationList } from '@/modules/organization';
-import { ref } from 'vue';
+import { inject, ref } from 'vue';
 import BaseHeader from '@/layouts/BaseHeader.vue';
 import { DepartmentList } from '@/modules/departments';
 
@@ -10,6 +10,8 @@ const refreshKey = ref(0);
 function refresh() {
   refreshKey.value++;
 }
+
+const userRole: number | undefined = inject('userRole');
 </script>
 
 <template>
@@ -17,7 +19,7 @@ function refresh() {
     <base-header />
     <div class="layout">
       <aside class="sidebar">
-        <organization-list @select="selectedId = $event" @refresh="refresh()" />
+        <organization-list @select="selectedId = $event" @refresh="refresh()" :role="userRole!" />
       </aside>
       <main class="content">
         <organization-info
@@ -29,6 +31,7 @@ function refresh() {
           v-if="selectedId !== null"
           :id="selectedId"
           :key="`depart-${selectedId}-${refreshKey}`"
+          :role="userRole!"
         />
         <div v-else class="placeholder">Выберите организацию для просмотра информации</div>
       </main>

@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import session from 'express-session';
+import { RedisService } from './redis/redis.service';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -18,6 +20,21 @@ async function bootstrap() {
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
     });
+    const redisService = app.get(RedisService);
+    const redisStore = redisService.getStore();
+    app.use(
+        session({
+            store: redisStore,
+            secret: configService.get('SECRET') || 'oops I did it again',
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                secure: false,
+                httpOnly: true,
+                maxAge: 1000 * 5 * 60,
+            },
+        }),
+    );
     await app.listen(configService.get('NESTPORT') || 3000);
 }
 bootstrap();

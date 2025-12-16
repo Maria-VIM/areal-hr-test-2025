@@ -4,7 +4,7 @@ export const api = {
   get(url: string, config?: any) {
     return apiClient.get(url, config);
   },
-  post(url: string, data: any, config?: any) {
+  post(url: string, data?: any, config?: any) {
     return apiClient.post(url, data, config);
   },
   patch(url: string, data: any) {

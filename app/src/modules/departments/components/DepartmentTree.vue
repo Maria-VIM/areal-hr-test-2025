@@ -6,6 +6,7 @@ import DepartmentInfo from '@/modules/departments/components/DepartmentInfo.vue'
 import type { Department } from '@/modules/departments/types/Department.ts';
 
 const props = defineProps<{
+  role: number;
   department: Department;
   level: number;
   isDeleted?: boolean;
@@ -35,7 +36,11 @@ watchEffect(() => {}, { flush: 'post' });
     </div>
     <transition name="slide-fade">
       <div v-if="isVisible" class="department-info-wrapper">
-        <DepartmentInfo :department_id="department.id" :is-parent-deleted="isParentDeleted" />
+        <DepartmentInfo
+          :department_id="department.id"
+          :is-parent-deleted="isParentDeleted"
+          :role="props.role"
+        />
       </div>
     </transition>
     <transition name="slide-fade">
@@ -45,6 +50,7 @@ watchEffect(() => {}, { flush: 'post' });
           :key="child.id"
           :department="child"
           :level="level + 1"
+          :role="props.role"
           :is-deleted="!!child.deleted_at || isDeleted"
           :is-parent-deleted="isDeleted"
           :has-children="child.children && child.children.length > 0"

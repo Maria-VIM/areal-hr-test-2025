@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router';
 import BtnBase from '@/components/BtnBase.vue';
-
+import { useAuthStore } from '@/modules/auth/store';
 const router = useRouter();
 const route = useRoute();
-
+const store = useAuthStore();
+async function logOut() {
+  await store.logout();
+  await router.push('/auth');
+}
 const navigateTo = (path: string) => {
   router.push(path);
 };
@@ -21,7 +25,7 @@ const isActive = (path: string) => route.path === path;
           <BtnBase
             class="nav-link"
             :class="{ active: isActive('/') }"
-            @click="navigateTo('/')"
+            @click="navigateTo('/organization')"
             content="Организации"
           />
         </li>
@@ -49,11 +53,13 @@ const isActive = (path: string) => route.path === path;
             content="Пользователи"
           />
         </li>
+        <li>
+          <BtnBase class="nav-link-out" content="Выйти" @click="logOut" />
+        </li>
       </ul>
     </nav>
   </header>
 </template>
-
 <style scoped>
 header {
   background: #ffffff;
@@ -85,6 +91,12 @@ nav {
   gap: 8px;
   padding: 0;
   margin: 0;
+}
+
+.nav-link-out {
+  background: #2c2c33;
+  font-weight: 500;
+  color: #d9d3e1;
 }
 
 .nav-link.active {

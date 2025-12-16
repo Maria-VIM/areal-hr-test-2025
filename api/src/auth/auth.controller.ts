@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    Req,
+    UnauthorizedException,
+    UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from './dto/login.dto';
 
@@ -8,9 +16,29 @@ export class AuthController {
     @UseGuards(AuthGuard('local'))
     @Post('login')
     async login(@Body() loginDto: LoginDto, @Req() req: any) {
+        req.session.user = req.user;
         return {
-            user: req.user,
             message: 'Login successful',
         };
+    }
+
+    @Post('logout')
+    logout(@Req() req: any) {
+        req.session.destroy((err: any) => {
+            if (err) {
+                throw new Error('Error with logout');
+            }
+            return { message: 'Logout successful' };
+        });
+    }
+
+    @Get('user')
+    @UseGuards(AuthGuard('session'))
+    getCurrentUser(@Req() req: any) {
+        if (req.session.user) {
+            return req.session.user;
+        } else {
+            throw new UnauthorizedException('Unauthorized');
+        }
     }
 }

@@ -9,5 +9,6 @@ const apiClient = axios.create({
   paramsSerializer: {
     indexes: null,
   },
+  withCredentials: true,
 });
 export default apiClient;

@@ -7,6 +7,10 @@ import BtnIcon from '@/components/BtnIcon.vue';
 const store = useOrganizationStore();
 const showModal = ref(false);
 const selectedId = ref<number | null>(null);
+
+const props = defineProps<{
+  role: number;
+}>();
 const emit = defineEmits<{
   (e: 'select', id: number): void;
 }>();
@@ -37,7 +41,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <BtnIcon class="btn-add pi pi-plus" @click="openModal()" />
+    <BtnIcon class="btn-add pi pi-plus" @click="openModal()" v-if="props.role == 1" />
     <div
       v-for="org in store.organizations"
       :key="org.id"
@@ -48,12 +52,13 @@ onMounted(() => {
       <div class="name">
         {{ org.name }}
       </div>
-      <div class="actions" v-if="org.deleted_at === null">
-        <BtnIcon class="pi pi-pencil action-edit" @click="openModal(org.id)" />
-        <BtnIcon class="pi pi-trash action-delete" @click="deleteOrg(org.id)" />
+      <div v-if="props.role == 1">
+        <div class="actions" v-if="org.deleted_at === null">
+          <BtnIcon class="pi pi-pencil action-edit" @click="openModal(org.id)" />
+          <BtnIcon class="pi pi-trash action-delete" @click="deleteOrg(org.id)" />
+        </div>
+        <BtnIcon v-else class="pi pi-refresh action-restore" @click="restoreOrg(org.id)" />
       </div>
-
-      <BtnIcon v-else class="pi pi-refresh action-restore" @click="restoreOrg(org.id)" />
     </div>
     <OrganizationModal
       :id="selectedId"

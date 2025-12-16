@@ -106,51 +106,53 @@ watch(
 </script>
 
 <template>
-  <div class="employee-list-wrapper">
-    <EmployeeModal
-      :key="modalKey"
-      :id="selectedId"
-      :visible="showModal"
-      @close="showModal = false"
-      @submit="loadEmployees"
-    />
-    <FileManager
-      :employee-id="selectedId!"
-      :key="fileKey"
-      :visible="showFile"
-      @close="showFile = false"
-    />
-    <div class="container" v-if="employees.length > 0">
-      <div
-        v-for="employee in employees"
-        @click="emit('select', employee.id)"
-        :key="employee.id"
-        class="row"
-      >
-        <p>{{ employee.first_name }} {{ employee.last_name }} {{ employee.middle_name }}</p>
-        <div class="btn-actions" v-if="props.params.option != 'deleted'">
-          <BtnIcon class="pi pi-address-book" @click="openModal(employee.id)" />
-          <BtnIcon class="pi pi-paperclip" @click="openFileModal(employee.id)" />
-          <BtnIcon
-            class="pi pi-trash action-delete"
-            v-if="props.params.option == 'trainees'"
-            @click="firedTrainees(employee.id)"
-          />
+  <div v-bind="$attrs">
+    <div class="employee-list-wrapper">
+      <EmployeeModal
+        :key="modalKey"
+        :id="selectedId"
+        :visible="showModal"
+        @close="showModal = false"
+        @submit="loadEmployees"
+      />
+      <FileManager
+        :employee-id="selectedId || 0"
+        :key="fileKey"
+        :visible="showFile"
+        @close="showFile = false"
+      />
+      <div class="container" v-if="employees.length > 0">
+        <div
+          v-for="employee in employees"
+          @click="emit('select', employee.id)"
+          :key="employee.id"
+          class="row"
+        >
+          <p>{{ employee.first_name }} {{ employee.last_name }} {{ employee.middle_name }}</p>
+          <div class="btn-actions" v-if="props.params.option != 'deleted'">
+            <BtnIcon class="pi pi-address-book" @click="openModal(employee.id)" />
+            <BtnIcon class="pi pi-paperclip" @click="openFileModal(employee.id)" />
+            <BtnIcon
+              class="pi pi-trash action-delete"
+              v-if="props.params.option == 'trainees'"
+              @click="firedTrainees(employee.id)"
+            />
+          </div>
         </div>
       </div>
+      <div v-else class="placeholder">Нет данных для отображения</div>
     </div>
-    <div v-else class="placeholder">Нет данных для отображения</div>
-  </div>
-  <div v-if="totalPages > 1" class="pagination">
-    <BtnBase content="назад" @click="loadPage(currentPage - 1)" :disabled="currentPage === 1" />
-    <span class="page-info">
-      Страница {{ currentPage }} из {{ totalPages }} (Всего: {{ totalEmployee }})
-    </span>
-    <BtnBase
-      content="вперед"
-      @click="loadPage(currentPage + 1)"
-      :disabled="currentPage === totalPages"
-    />
+    <div v-if="totalPages > 1" class="pagination">
+      <BtnBase content="назад" @click="loadPage(currentPage - 1)" :disabled="currentPage === 1" />
+      <span class="page-info">
+        Страница {{ currentPage }} из {{ totalPages }} (Всего: {{ totalEmployee }})
+      </span>
+      <BtnBase
+        content="вперед"
+        @click="loadPage(currentPage + 1)"
+        :disabled="currentPage === totalPages"
+      />
+    </div>
   </div>
 </template>
 

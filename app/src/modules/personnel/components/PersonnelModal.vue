@@ -197,15 +197,6 @@ watch(
 </template>
 
 <style scoped>
-.form-group {
-  margin-bottom: 1rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #555;
-}
 .input-error {
   border: 1px solid #731919;
 }

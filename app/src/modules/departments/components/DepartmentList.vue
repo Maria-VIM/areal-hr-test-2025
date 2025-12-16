@@ -6,7 +6,7 @@ import DepartmentTree from '@/modules/departments/components/DepartmentTree.vue'
 import BtnBase from '@/components/BtnBase.vue';
 import DepartmentModal from '@/modules/departments/components/DepartmentModal.vue';
 
-const props = defineProps<{ id: number }>();
+const props = defineProps<{ id: number; role: number }>();
 
 const store = useDepartmentStore();
 
@@ -67,7 +67,7 @@ watch(
 
 <template>
   <div class="department-item">
-    <BtnBase content="Добавить отдел" @click="openCreateModal" />
+    <BtnBase content="Добавить отдел" @click="openCreateModal" v-if="props.role == 1" />
     <DepartmentModal
       v-if="isModalOpen"
       :organization_id="props.id"
@@ -83,6 +83,7 @@ watch(
         :level="0"
         :is-deleted="isDeletedForRoot(dept)"
         :is-parent-deleted="false"
+        :role="props.role"
         @departmentUpdated="handleDepartmentUpdate"
       />
     </ul>

@@ -31,7 +31,7 @@ export class UserController {
     getById(@Param('id') id: number): Promise<Users> {
         return this.userService.findOne(id);
     }
-    @Delete('id/:id')
+    @Delete('/:id')
     delete(@Param('id') id: number): Promise<Users> {
         return this.userService.delete(id);
     }

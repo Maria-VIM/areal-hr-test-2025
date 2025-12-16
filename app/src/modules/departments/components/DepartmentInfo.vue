@@ -30,14 +30,16 @@
         <span class="label">Updated:</span>
         <span class="value">{{ formatDate(department.updated_at) }}</span>
       </div>
-      <div class="info-item actions">
-        <div v-if="department.deleted_at === null">
-          <BtnIcon class="pi pi-trash" @click="deleteDepartment(department.id)" />
-          <BtnIcon class="pi pi-pencil" @click="openEditModal" />
-          <BtnIcon class="pi pi-plus-circle" @click="openCreateModal" />
-        </div>
-        <div v-else-if="!props.isParentDeleted">
-          <BtnIcon class="pi pi-refresh" @click="restoreDepartment(department.id)" />
+      <div v-if="props.role == 1">
+        <div class="info-item actions">
+          <div v-if="department.deleted_at === null">
+            <BtnIcon class="pi pi-trash" @click="deleteDepartment(department.id)" />
+            <BtnIcon class="pi pi-pencil" @click="openEditModal" />
+            <BtnIcon class="pi pi-plus-circle" @click="openCreateModal" />
+          </div>
+          <div v-else-if="!props.isParentDeleted">
+            <BtnIcon class="pi pi-refresh" @click="restoreDepartment(department.id)" />
+          </div>
         </div>
       </div>
     </div>
@@ -56,6 +58,7 @@ import { useGeneralStore } from '@/store';
 const props = defineProps<{
   department_id: number;
   isParentDeleted?: boolean;
+  role: number;
 }>();
 const emit = defineEmits(['departmentUpdated']);
 

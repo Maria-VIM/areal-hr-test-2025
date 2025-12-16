@@ -3,12 +3,18 @@ import OrganizationView from '@/views/OrganizationView.vue';
 import JobView from '@/views/JobView.vue';
 import EmployeeView from '@/views/EmployeeView.vue';
 import UserView from '@/views/UserView.vue';
+import LoginView from '@/views/LoginView.vue';
 
 const routes = [
-  { path: '/', component: OrganizationView },
-  { path: '/job', component: JobView },
-  { path: '/employees', component: EmployeeView },
-  { path: '/users', component: UserView },
+  {
+    path: '/',
+    redirect: '/organization',
+  },
+  { path: '/organization', component: OrganizationView, meta: { requiresAuth: true } },
+  { path: '/job', component: JobView, meta: { requiresAuth: true } },
+  { path: '/employees', component: EmployeeView, meta: { requiresAuth: true } },
+  { path: '/users', component: UserView, meta: { requiresAuth: true } },
+  { path: '/auth', component: LoginView, meta: { requiresAuth: false } },
 ];
 
 export const router = createRouter({

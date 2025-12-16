@@ -4,6 +4,10 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useUsersStore } from '@/modules/users/store';
 import BtnBase from '@/components/BtnBase.vue';
 import UserModal from '@/modules/users/components/UserModal.vue';
+
+const props = defineProps<{
+  role: number;
+}>();
 const store = useUsersStore();
 const showModal = ref(false);
 const selectedId = ref<number | null>(null);
@@ -46,7 +50,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <BtnBase content="Добавить" class="add-base-btn" @click="openModal" />
+    <BtnBase content="Добавить" class="add-base-btn" @click="openModal" v-if="props.role == 1" />
     <div class="columns-container">
       <div class="column">
         <h3>Администраторы</h3>
@@ -64,7 +68,7 @@ onMounted(() => {
             <p>Имя: {{ user.full_name }}</p>
             <p>Логин: {{ user.login }}</p>
           </div>
-          <div class="actions" v-if="user.deleted_at === null">
+          <div class="actions" v-if="user.deleted_at === null && props.role == 1">
             <BtnIcon class="pi pi-pencil action-edit" @click="openModal(user.id)" />
             <BtnIcon class="pi pi-trash action-delete" @click="deleteUser(user.id)" />
             <BtnIcon
@@ -96,7 +100,7 @@ onMounted(() => {
             <p>Имя: {{ user.full_name }}</p>
             <p>Логин: {{ user.login }}</p>
           </div>
-          <div class="actions" v-if="user.deleted_at === null">
+          <div class="actions" v-if="user.deleted_at === null && props.role == 1">
             <BtnIcon class="pi pi-pencil action-edit" @click="openModal(user.id)" />
             <BtnIcon class="pi pi-trash action-delete" @click="deleteUser(user.id)" />
             <BtnIcon

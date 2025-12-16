@@ -11,6 +11,7 @@ import { FileModule } from './file/file.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RedisService } from './redis/redis.service';
 
 @Module({
     imports: [
@@ -31,5 +32,7 @@ import { AuthModule } from './auth/auth.module';
         UserModule,
         AuthModule,
     ],
+    exports: [RedisService],
+    providers: [RedisService],
 })
 export class AppModule {}

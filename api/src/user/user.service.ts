@@ -39,8 +39,8 @@ export class UserService {
     }
     async findOneByLogin(login: string): Promise<Users> {
         const result: QueryResult = await this.dbService.query(
-            `SELECT id, login, password
-            FROM "User"
+            `SELECT u.id as id, r.id as role_id, login, password, is_active, u.deleted_at
+            FROM "User" u JOIN "Role" r ON u.role_id = r.id
             WHERE login = $1`,
             [login],
         );
