@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { watch, ref, onMounted } from 'vue';
+import { watch, ref } from 'vue';
 import { useJobStore } from '@/modules/job/store';
 import type { Job } from '@/modules/job/types/Job.ts';
 import JobModal from '@/modules/job/components/JobModal.vue';
 import JobInfo from '@/modules/job/components/JobInfo.vue';
 import BtnBase from '@/components/BtnBase.vue';
 import BtnIcon from '@/components/BtnIcon.vue';
+import { HistoryList } from '@/modules/history';
 
 const props = defineProps<{
   name?: string | number | null;
@@ -21,6 +22,9 @@ const pageSize = ref<number>(10);
 const totalPages = ref<number>(0);
 const totalJobs = ref<number>(0);
 
+const selectedIdForHistory = ref<number>(1);
+const showHistory = ref(false);
+
 function openModal(id?: number) {
   selectedId.value = id ?? null;
   showModal.value = true;
@@ -29,6 +33,11 @@ function openModal(id?: number) {
 function openInfo(id: number) {
   selectedId.value = id;
   showInfo.value = true;
+}
+
+function openHistory(id: number) {
+  selectedIdForHistory.value = id;
+  showHistory.value = true;
 }
 
 function handleClose() {
@@ -83,10 +92,21 @@ watch(
     @close="handleClose"
   />
   <JobInfo :visible="showInfo" :id="selectedId" @close="handleClose" />
-
+  <HistoryList
+    :id="selectedIdForHistory"
+    :visible="showHistory"
+    entity="Job_title"
+    @close="showHistory = false"
+  />
   <div class="container">
     <div>
-      <div v-for="j in job" :key="j.id" class="row" :class="{ deleted: j.deleted_at }">
+      <div
+        v-for="j in job"
+        :key="j.id"
+        class="row"
+        :class="{ deleted: j.deleted_at }"
+        @dblclick="openHistory(j.id)"
+      >
         <div class="name" @click="openInfo(j.id)">{{ j.name }}</div>
         <div class="actions" v-if="!j.deleted_at">
           <BtnIcon

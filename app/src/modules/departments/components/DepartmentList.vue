@@ -17,7 +17,6 @@ const treeKey = ref(0);
 
 function openCreateModal() {
   modalMode.value = 'create';
-
   isModalOpen.value = true;
 }
 function closeModal() {

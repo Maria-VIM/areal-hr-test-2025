@@ -3,10 +3,14 @@ import { ref, onMounted, watch } from 'vue';
 import { useOrganizationStore } from '../store/index.ts';
 import OrganizationModal from './OrganizationModal.vue';
 import BtnIcon from '@/components/BtnIcon.vue';
+import { HistoryList } from '@/modules/history';
 
 const store = useOrganizationStore();
 const showModal = ref(false);
 const selectedId = ref<number | null>(null);
+
+const showHistory = ref(false);
+const selectedIdForHistory = ref<number>(1);
 
 const props = defineProps<{
   role: number;
@@ -17,6 +21,12 @@ const emit = defineEmits<{
 function openModal(id?: number) {
   selectedId.value = id ?? null;
   showModal.value = true;
+}
+
+function openHistoryModal(id: number) {
+  selectedIdForHistory.value = id;
+  console.log(selectedIdForHistory.value);
+  showHistory.value = true;
 }
 
 async function deleteOrg(id: number): Promise<void> {
@@ -48,6 +58,7 @@ onMounted(() => {
       @click="emit('select', org.id)"
       class="row"
       :class="{ deleted: org.deleted_at !== null }"
+      @dblclick="openHistoryModal(org.id)"
     >
       <div class="name">
         {{ org.name }}
@@ -67,6 +78,12 @@ onMounted(() => {
         showModal = false;
         selectedId = null;
       "
+    />
+    <HistoryList
+      :id="selectedIdForHistory"
+      :visible="showHistory"
+      entity="Organization"
+      @close="showHistory = false"
     />
   </div>
 </template>

@@ -40,11 +40,18 @@
           <div v-else-if="!props.isParentDeleted">
             <BtnIcon class="pi pi-refresh" @click="restoreDepartment(department.id)" />
           </div>
+          <BtnIcon class="pi pi-history" @click="openHistoryModal" />
         </div>
       </div>
     </div>
   </div>
   <div v-else class="loading">Loading department data...</div>
+  <HistoryList
+    :id="props.department_id"
+    :visible="showHistory"
+    entity="Department"
+    @close="showHistory = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -54,6 +61,7 @@ import DepartmentModal from '@/modules/departments/components/DepartmentModal.vu
 import BtnIcon from '@/components/BtnIcon.vue';
 import type { Department } from '@/modules/departments/types/Department.ts';
 import { useGeneralStore } from '@/store';
+import { HistoryList } from '@/modules/history';
 
 const props = defineProps<{
   department_id: number;
@@ -69,6 +77,11 @@ const department = ref<Department | null>(null);
 const isModalOpen = ref(false);
 const modalMode = ref<boolean>(false);
 const modalId = ref<number | null>(null);
+
+const showHistory = ref(false);
+function openHistoryModal() {
+  showHistory.value = true;
+}
 
 const formatDate = generalStore.formatDate;
 

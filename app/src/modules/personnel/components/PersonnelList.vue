@@ -4,6 +4,7 @@ import { watch, ref } from 'vue';
 import { usePersonnelStore } from '@/modules/personnel/store';
 import BtnIcon from '@/components/BtnIcon.vue';
 import PersonnelModal from '@/modules/personnel/components/PersonnelModal.vue';
+import { HistoryList } from '@/modules/history';
 
 const props = defineProps<{
   employee_id?: number;
@@ -22,6 +23,14 @@ const selectedId = ref<number | null>(null);
 function openModal(id?: number) {
   selectedId.value = id ?? null;
   showModal.value = true;
+}
+
+const showHistory = ref(false);
+const selectedIdForHistory = ref<number>(0);
+
+function openHistoryModal(id: number) {
+  selectedIdForHistory.value = id;
+  showHistory.value = true;
 }
 
 async function deletePersonnel(id: number) {
@@ -59,12 +68,19 @@ watch(
           selectedId = null;
         "
       />
+      <HistoryList
+        :id="selectedIdForHistory"
+        :visible="showHistory"
+        entity="Personnel_operation"
+        @close="showHistory = false"
+      />
       <div v-if="operations && operations.length > 0">
         <div
           v-for="operation in operations"
           :key="operation.id"
           class="row"
           :class="{ deleted: operation.dismissal_date !== null }"
+          @dblclick="openHistoryModal(operation.id)"
         >
           <div class="name">
             <div>{{ operation.organization }}</div>

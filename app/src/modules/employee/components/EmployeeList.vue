@@ -6,6 +6,7 @@ import EmployeeModal from '@/modules/employee/components/EmployeeModal.vue';
 import { FileManager } from '@/modules/files/components';
 import BtnBase from '@/components/BtnBase.vue';
 import type { Employee } from '@/modules/employee/types/Employee.ts';
+import { HistoryList } from '@/modules/history';
 
 const props = defineProps<{
   params: {
@@ -31,6 +32,11 @@ function openFileModal(id: number) {
   fileKey.value++;
 }
 
+function openHistoryModal(id: number) {
+  selectedIdForHistory.value = id;
+  showHistory.value = true;
+}
+
 async function firedTrainees(id: number) {
   await store.deleteEmployee(id);
 }
@@ -53,6 +59,9 @@ const pageSize = ref(10);
 const currentPage = ref<number>(1);
 const totalPages = ref<number>(0);
 const totalEmployee = ref<number>(0);
+
+const showHistory = ref(false);
+const selectedIdForHistory = ref<number>(1);
 
 const store = useEmployeesStore();
 
@@ -121,12 +130,19 @@ watch(
         :visible="showFile"
         @close="showFile = false"
       />
+      <HistoryList
+        :id="selectedIdForHistory"
+        :visible="showHistory"
+        entity="Employee"
+        @close="showHistory = false"
+      />
       <div class="container" v-if="employees.length > 0">
         <div
           v-for="employee in employees"
           @click="emit('select', employee.id)"
           :key="employee.id"
           class="row"
+          @dblclick="openHistoryModal(employee.id)"
         >
           <p>{{ employee.first_name }} {{ employee.last_name }} {{ employee.middle_name }}</p>
           <div class="btn-actions" v-if="props.params.option != 'deleted'">
