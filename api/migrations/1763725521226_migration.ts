@@ -171,21 +171,10 @@ exports.up = pgm => {
         },
     });
 
-    pgm.createTable('Operation_type', {
-        id: 'id',
-        name: { type: 'text', notNull: true },
-    });
-
     pgm.createTable('History', {
         id: 'id',
-        operation_type_id: {
-            type: 'integer',
-            references: '"Operation_type"',
-            notNull: true,
-        },
         operation_object: { type: 'text', notNull: true },
         record_id: { type: 'integer', notNull: true },
-        changed_fields: { type: 'text[]', notNull: true },
         old_values: { type: 'jsonb' },
         new_values: { type: 'jsonb', notNull: true },
         user_id: {
@@ -209,14 +198,12 @@ exports.up = pgm => {
     pgm.createIndex('Personnel_operation', 'department_id');
     pgm.createIndex('Personnel_operation', 'job_id');
     pgm.createIndex('History', 'user_id');
-    pgm.createIndex('History', 'operation_type_id');
 };
 
 exports.down = pgm => {
     pgm.dropTable('History');
     pgm.dropTable('Passport_scan');
     pgm.dropTable('Personnel_operation');
-    pgm.dropTable('Operation_type');
     pgm.dropTable('File');
     pgm.dropTable('Employee');
     pgm.dropTable('User');

@@ -7,6 +7,7 @@ import {
     Param,
     Patch,
     Post,
+    Req,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -56,6 +57,7 @@ export class OrganizationController {
     update(
         @Param('id') id: number,
         @Body() body: UpdateOrganizationDto,
+        @Req() req: any,
     ): Promise<Organization> {
         const { error, value } = updateOrganizationSchema.validate(body);
         if (error) {
@@ -64,7 +66,8 @@ export class OrganizationController {
                 details: error.details,
             });
         }
-        return this.organizationService.update(id, value);
+        const user_id: number = req.session.user?.id;
+        return this.organizationService.update(id, value, user_id);
     }
 
     @Delete(':id')

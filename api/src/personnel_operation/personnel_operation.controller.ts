@@ -7,6 +7,7 @@ import {
     Param,
     Patch,
     Post,
+    Req,
 } from '@nestjs/common';
 import { PersonnelOperationService } from './personnel_operation.service';
 import { PersonnelOperation } from './enitites/entity-personnel_operation';
@@ -51,6 +52,7 @@ export class PersonnelOperationController {
     async update(
         @Param('id') id: number,
         @Body() body: UpdatePersonnelOperationDto,
+        @Req() req: any,
     ): Promise<PersonnelOperation> {
         const { error, value } = UpdatePersonnelOperationSchema.validate(body);
         if (error) {
@@ -59,6 +61,7 @@ export class PersonnelOperationController {
                 details: error.details,
             });
         }
-        return this.personnelOperationService.update(id, value);
+        const user_id: number = req.session.user?.id;
+        return this.personnelOperationService.update(id, value, user_id);
     }
 }

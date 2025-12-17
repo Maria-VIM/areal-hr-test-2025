@@ -8,6 +8,7 @@ import {
     Patch,
     Post,
     Query,
+    Req,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { Employee } from './entities/entity-employeee';
@@ -80,6 +81,7 @@ export class EmployeeController {
     update(
         @Param('id') id: number,
         @Body() body: UpdateEmployeeDto,
+        @Req() req: any,
     ): Promise<Employee> {
         const { error, value } = updateEmployeeSchema.validate(body);
         if (error) {
@@ -88,7 +90,8 @@ export class EmployeeController {
                 details: error.details,
             });
         }
-        return this.employeeService.update(id, value);
+        const user_id = req.session.user?.id;
+        return this.employeeService.update(id, value, user_id);
     }
 
     @Delete(':id')

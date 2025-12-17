@@ -4,10 +4,15 @@ import { QueryResult } from 'pg';
 import { PersonnelOperation } from './enitites/entity-personnel_operation';
 import { CreatePersonnelOperationDto } from './dto/create-personnel_operation.dto';
 import { UpdatePersonnelOperationDto } from './dto/update-personnel_operation.dto';
+import { HistoryService } from '../history/history.service';
+import { logEntityChanges } from '../history/log';
 
 @Injectable()
 export class PersonnelOperationService {
-    constructor(private dbService: DbService) {}
+    constructor(
+        private dbService: DbService,
+        private historyService: HistoryService,
+    ) {}
     async findAllById(employee_id: number): Promise<PersonnelOperation[]> {
         const query: QueryResult = await this.dbService.query(
             `SELECT po.id, po.employee_id, o.id as organization_id,  o.name as organization,
@@ -100,9 +105,15 @@ export class PersonnelOperationService {
     async update(
         id: number,
         body: UpdatePersonnelOperationDto,
+        user_id: number,
     ): Promise<PersonnelOperation> {
         const { department_id, job_id, salary } = body;
         try {
+            const oldRecord: QueryResult = await this.dbService.query(
+                `SELECT * FROM "Personnel_operation" WHERE id = $1`,
+                [id],
+            );
+            const old_row = oldRecord.rows[0];
             const query: QueryResult = await this.dbService.query(
                 `UPDATE "Personnel_operation" SET updated_at = NOW(),
                     department_id = COALESCE($2, department_id),
@@ -111,7 +122,14 @@ export class PersonnelOperationService {
                     WHERE id = $1 RETURNING *`,
                 [id, department_id, job_id, salary],
             );
-            return query.rows[0];
+            const new_row = query.rows[0];
+            await logEntityChanges(this.historyService, {
+                entity: 'Personnel_operation',
+                old_row,
+                new_row,
+                user_id,
+            });
+            return new_row;
         } catch (error) {
             console.error(error);
             return error;

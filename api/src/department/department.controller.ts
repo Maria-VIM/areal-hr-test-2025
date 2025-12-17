@@ -7,6 +7,7 @@ import {
     Param,
     Patch,
     Post,
+    Req,
 } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { Department } from './entities/entity-department';
@@ -36,11 +37,15 @@ export class DepartmentController {
         return this.departmentService.findOneById(id);
     }
     @Delete(':id')
-    delete(@Param('id') id: number) {
+    delete(@Param('id') id: number): Promise<Department> {
         return this.departmentService.delete(id);
     }
     @Patch(':id')
-    update(@Param('id') id: number, @Body() body: UpdateDepartmentDto) {
+    update(
+        @Param('id') id: number,
+        @Body() body: UpdateDepartmentDto,
+        @Req() req: any,
+    ): Promise<Department> {
         const { error, value } = updateDepartmentSchema.validate(body);
         if (error) {
             throw new BadRequestException({
@@ -48,10 +53,11 @@ export class DepartmentController {
                 details: error.details,
             });
         }
-        return this.departmentService.update(id, value);
+        const user_id: number = req.session.user?.id;
+        return this.departmentService.update(id, value, user_id);
     }
     @Patch('/restore/:id')
-    restore(@Param('id') id: number) {
+    restore(@Param('id') id: number): Promise<Department> {
         return this.departmentService.restore(id);
     }
     @Post()

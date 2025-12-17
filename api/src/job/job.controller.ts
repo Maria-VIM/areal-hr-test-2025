@@ -8,6 +8,7 @@ import {
     Patch,
     Post,
     Query,
+    Req,
 } from '@nestjs/common';
 import { JobService } from './job.service';
 import { Job } from './entities/entity-job';
@@ -62,7 +63,11 @@ export class JobController {
         return this.jobService.restore(id);
     }
     @Patch(':id')
-    update(@Param('id') id: number, @Body() body: UpdateJobDto): Promise<Job> {
+    update(
+        @Param('id') id: number,
+        @Body() body: UpdateJobDto,
+        @Req() req: any,
+    ): Promise<Job> {
         const { error, value } = updateJobSchema.validate(body);
         if (error) {
             throw new BadRequestException({
@@ -70,6 +75,7 @@ export class JobController {
                 details: error.details,
             });
         }
-        return this.jobService.update(id, value);
+        const user_id: number = req.session.user?.id;
+        return this.jobService.update(id, value, user_id);
     }
 }

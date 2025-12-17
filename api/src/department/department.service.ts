@@ -4,10 +4,15 @@ import { QueryResult } from 'pg';
 import { Department } from './entities/entity-department';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { HistoryService } from '../history/history.service';
+import { logEntityChanges } from '../history/log';
 
 @Injectable()
 export class DepartmentService {
-    constructor(private dbService: DbService) {}
+    constructor(
+        private dbService: DbService,
+        private historyService: HistoryService,
+    ) {}
     async findAllByOrganizationId(
         organization_id: number,
     ): Promise<Department[]> {
@@ -63,16 +68,32 @@ export class DepartmentService {
         }
     }
 
-    async update(id: number, body: UpdateDepartmentDto): Promise<Department> {
+    async update(
+        id: number,
+        body: UpdateDepartmentDto,
+        user_id: number,
+    ): Promise<Department> {
         try {
             const { name, comment } = body;
+            const oldRecord: QueryResult = await this.dbService.query(
+                `SELECT * FROM "Department" WHERE id = $1`,
+                [id],
+            );
+            const old_row = oldRecord.rows[0];
             const result: QueryResult = await this.dbService.query(
                 `UPDATE "Department" SET name = COALESCE($1, name), 
                         comment = COALESCE($2, comment), updated_at = NOW()
                         WHERE id = $3 RETURNING *`,
                 [name, comment, id],
             );
-            return result.rows[0];
+            const new_row = result.rows[0];
+            await logEntityChanges(this.historyService, {
+                entity: 'Department',
+                old_row,
+                new_row,
+                user_id: user_id,
+            });
+            return new_row;
         } catch (error) {
             console.error(error);
             return error;

@@ -4,10 +4,15 @@ import { Employee } from './entities/entity-employeee';
 import { QueryResult } from 'pg';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { HistoryService } from '../history/history.service';
+import { logEntityChanges } from '../history/log';
 
 @Injectable()
 export class EmployeeService {
-    constructor(private dbService: DbService) {}
+    constructor(
+        private dbService: DbService,
+        private historyService: HistoryService,
+    ) {}
     async findAll(
         page: number = 1,
         pageSize: number = 10,
@@ -170,7 +175,11 @@ export class EmployeeService {
             return error;
         }
     }
-    async update(id: number, body: UpdateEmployeeDto): Promise<Employee> {
+    async update(
+        id: number,
+        body: UpdateEmployeeDto,
+        history_user_id: number,
+    ): Promise<Employee> {
         try {
             const {
                 first_name,
@@ -181,7 +190,11 @@ export class EmployeeService {
                 registration_address,
                 user_id,
             } = body;
-
+            const oldRecord: QueryResult = await this.dbService.query(
+                `SELECT * FROM "Employee" WHERE id=$1`,
+                [id],
+            );
+            const old_row = oldRecord.rows[0];
             const query: QueryResult = await this.dbService.query(
                 `UPDATE "Employee" SET
                 first_name = COALESCE($1, first_name),
@@ -203,7 +216,14 @@ export class EmployeeService {
                     user_id,
                 ],
             );
-            return query.rows[0];
+            const new_row = query.rows[0];
+            await logEntityChanges(this.historyService, {
+                entity: 'Employee',
+                old_row,
+                new_row,
+                user_id: history_user_id,
+            });
+            return new_row;
         } catch (error) {
             console.log(error);
             return error;
