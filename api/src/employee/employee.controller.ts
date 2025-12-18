@@ -9,6 +9,8 @@ import {
     Post,
     Query,
     Req,
+    UnauthorizedException,
+    UseGuards,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { Employee } from './entities/entity-employeee';
@@ -16,11 +18,14 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { createEmployeeSchema } from './schemas/create-employee.schema';
 import { updateEmployeeSchema } from './schemas/update-employee.schema';
+import { AuthGuard } from '@nestjs/passport';
 @Controller('employee')
 export class EmployeeController {
     constructor(private readonly employeeService: EmployeeService) {}
     @Get('')
+    @UseGuards(AuthGuard('session'))
     getAll(
+        @Req() req: any,
         @Query('page') page: number = 1,
         @Query('pageSize') pageSize: number = 10,
         @Query('organization_id') organization_id?: number,
@@ -32,18 +37,24 @@ export class EmployeeController {
         totalPages: number;
         totalCount: number;
     }> {
-        return this.employeeService.findAll(
-            page,
-            pageSize,
-            organization_id,
-            department_id,
-            name,
-            is_deleted,
-        );
+        if (req.session.user) {
+            return this.employeeService.findAll(
+                page,
+                pageSize,
+                organization_id,
+                department_id,
+                name,
+                is_deleted,
+            );
+        } else {
+            throw new UnauthorizedException('Unauthorized');
+        }
     }
 
     @Get('/trainees')
+    @UseGuards(AuthGuard('session'))
     getAllTrainees(
+        @Req() req: any,
         @Query('page') page: number = 1,
         @Query('pageSize') pageSize: number = 10,
         @Query('name') name?: string,
@@ -52,50 +63,82 @@ export class EmployeeController {
         totalPages: number;
         totalCount: number;
     }> {
-        return this.employeeService.findTrainees(page, pageSize, name);
+        if (req.session.user) {
+            return this.employeeService.findTrainees(page, pageSize, name);
+        } else {
+            throw new UnauthorizedException('Unauthorized');
+        }
     }
 
     @Get('/active')
-    getAllActive(): Promise<Employee[]> {
-        return this.employeeService.findAllActive();
+    @UseGuards(AuthGuard('session'))
+    getAllActive(@Req() req: any): Promise<Employee[]> {
+        if (req.session.user) {
+            return this.employeeService.findAllActive();
+        } else {
+            throw new UnauthorizedException('Unauthorized');
+        }
     }
 
     @Get('/id/:id')
-    getById(@Param('id') id: number): Promise<Employee> {
-        return this.employeeService.findOneById(id);
+    @UseGuards(AuthGuard('session'))
+    getById(@Param('id') id: number, @Req() req: any): Promise<Employee> {
+        if (req.session.user) {
+            return this.employeeService.findOneById(id);
+        } else {
+            throw new UnauthorizedException('Unauthorized');
+        }
     }
 
     @Post()
-    create(@Body() body: CreateEmployeeDto): Promise<Employee> {
-        const { error, value } = createEmployeeSchema.validate(body);
-        if (error) {
-            throw new BadRequestException({
-                message: 'Validation failed',
-                details: error.details,
-            });
+    @UseGuards(AuthGuard('session'))
+    create(
+        @Body() body: CreateEmployeeDto,
+        @Req() req: any,
+    ): Promise<Employee> {
+        if (req.session.user) {
+            const { error, value } = createEmployeeSchema.validate(body);
+            if (error) {
+                throw new BadRequestException({
+                    message: 'Validation failed',
+                    details: error.details,
+                });
+            }
+            return this.employeeService.create(value);
+        } else {
+            throw new UnauthorizedException('Unauthorized');
         }
-        return this.employeeService.create(value);
     }
 
     @Patch(':id')
+    @UseGuards(AuthGuard('session'))
     update(
         @Param('id') id: number,
         @Body() body: UpdateEmployeeDto,
         @Req() req: any,
     ): Promise<Employee> {
-        const { error, value } = updateEmployeeSchema.validate(body);
-        if (error) {
-            throw new BadRequestException({
-                message: 'Validation failed',
-                details: error.details,
-            });
+        if (req.session.user) {
+            const { error, value } = updateEmployeeSchema.validate(body);
+            if (error) {
+                throw new BadRequestException({
+                    message: 'Validation failed',
+                    details: error.details,
+                });
+            }
+            const user_id = req.session.user?.id;
+            return this.employeeService.update(id, value, user_id);
+        } else {
+            throw new UnauthorizedException('Unauthorized');
         }
-        const user_id = req.session.user?.id;
-        return this.employeeService.update(id, value, user_id);
     }
 
     @Delete(':id')
-    delete(@Param('id') id: number): Promise<Employee> {
-        return this.employeeService.delete(id);
+    @UseGuards(AuthGuard('session'))
+    delete(@Param('id') id: number, @Req() req: any): Promise<Employee> {
+        if (req.session.user) {
+            return this.employeeService.delete(id);
+        } else {
+            throw new UnauthorizedException('Unauthorized');
+        }
     }
 }

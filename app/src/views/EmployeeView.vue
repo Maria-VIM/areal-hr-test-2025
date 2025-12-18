@@ -123,7 +123,7 @@ function openModal() {
           </div>
           <div class="radio-group">
             <radio-btn
-              text="Все"
+              text="Работники"
               aria-checked="true"
               value="all"
               :model-value="selectedOption || 'all'"
