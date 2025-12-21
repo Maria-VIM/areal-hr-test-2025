@@ -8,7 +8,6 @@ import {
     Patch,
     Post,
     Req,
-    UnauthorizedException,
     UseGuards,
 } from '@nestjs/common';
 import { OrganizationService } from './organization.service';
@@ -23,78 +22,41 @@ import { AuthGuard } from '@nestjs/passport';
 export class OrganizationController {
     constructor(private readonly organizationService: OrganizationService) {}
     @Get()
-    @UseGuards(AuthGuard('session'))
-    findAll(@Req() req: any): Promise<Organization[]> {
-        if (req.session.user) {
-            return this.organizationService.findAll();
-        } else {
-            throw new UnauthorizedException('Unauthorized');
-        }
+    findAll(): Promise<Organization[]> {
+        return this.organizationService.findAll();
     }
 
     @Get('active')
-    @UseGuards(AuthGuard('session'))
-    findAllActive(@Req() req: any): Promise<Organization[]> {
-        if (req.session.user) {
-            return this.organizationService.findAllActive();
-        } else {
-            throw new UnauthorizedException('Unauthorized');
-        }
+    findAllActive(): Promise<Organization[]> {
+        return this.organizationService.findAllActive();
     }
 
     @Get('id/:id')
-    @UseGuards(AuthGuard('session'))
-    findOne(@Param('id') id: number, @Req() req: any): Promise<Organization> {
-        if (req.session.user) {
-            return this.organizationService.findOneById(id);
-        } else {
-            throw new UnauthorizedException('Unauthorized');
-        }
+    findOne(@Param('id') id: number): Promise<Organization> {
+        return this.organizationService.findOneById(id);
     }
 
     @Get('name/:name')
-    @UseGuards(AuthGuard('session'))
-    findOneByName(
-        @Param('name') name: string,
-        @Req() req: any,
-    ): Promise<Organization[]> {
-        if (req.session.user) {
-            return this.organizationService.findByName(name);
-        } else {
-            throw new UnauthorizedException('Unauthorized');
-        }
+    findOneByName(@Param('name') name: string): Promise<Organization[]> {
+        return this.organizationService.findByName(name);
     }
 
     @Post()
-    @UseGuards(AuthGuard('session'))
-    create(
-        @Body() body: CreateOrganizationDto,
-        @Req() req: any,
-    ): Promise<Organization> {
-        if (req.session.user) {
-            const { error, value } = createOrganizationSchema.validate(body);
-            if (error) {
-                throw new BadRequestException({
-                    message: 'Validation failed',
-                    details: error.details,
-                });
-            }
-            return this.organizationService.create(value);
-        } else {
-            throw new UnauthorizedException('Unauthorized');
+    create(@Body() body: CreateOrganizationDto): Promise<Organization> {
+        const { error, value } = createOrganizationSchema.validate(body);
+        if (error) {
+            throw new BadRequestException({
+                message: 'Validation failed',
+                details: error.details,
+            });
         }
+        return this.organizationService.create(value);
     }
     @Patch('/restore/:id')
-    @UseGuards(AuthGuard('session'))
-    restore(@Param('id') id: number, @Req() req: any): Promise<Organization> {
-        if (req.session.user) {
-            return this.organizationService.restore(id);
-        } else {
-            throw new UnauthorizedException('Unauthorized');
-        }
+    restore(@Param('id') id: number): Promise<Organization> {
+        return this.organizationService.restore(id);
     }
     @Patch(':id')
-    @UseGuards(AuthGuard('session'))
     update(
         @Param('id') id: number,
         @Body() body: UpdateOrganizationDto,
@@ -114,10 +76,6 @@ export class OrganizationController {
     @Delete(':id')
     @UseGuards(AuthGuard('session'))
     delete(@Param('id') id: number, @Req() req: any): Promise<Organization> {
-        if (req.session.user) {
-            return this.organizationService.delete(id);
-        } else {
-            throw new UnauthorizedException('Unauthorized');
-        }
+        return this.organizationService.delete(id);
     }
 }

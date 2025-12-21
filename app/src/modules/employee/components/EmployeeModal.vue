@@ -60,24 +60,25 @@ function validate() {
     errors.value.date_of_birth = 'Дата рождения не может быть пустой';
     isValid = false;
   }
-  if (!passportSeries.value.trim()) {
-    errors.value.passportSeries = 'Серия паспорта не может быть пустой';
+  if (!passportSeries.value.trim() && !/^\d{4}$/.test(passportSeries.value)) {
+    errors.value.passportSeries =
+      'Серия паспорта не может быть пустой и должна содержать 4 символа';
     isValid = false;
   }
   if (!passportNumber.value.trim() || !/^\d{6}$/.test(passportNumber.value)) {
     errors.value.passportNumber = 'Номер паспорта не может быть пустым и должен содержать 6 цифр';
     isValid = false;
   }
-  if (!passportIssuedBy.value.trim()) {
-    errors.value.passportIssuedBy = 'Кем выдан паспорт не может быть пустым';
+  if (!passportIssuedBy.value.trim() || !passportIssuedBy.value.startsWith('ОВД')) {
+    errors.value.passportIssuedBy = 'Кем выдан паспорт? Не оставляйте пустым. Начинается с ОВД';
     isValid = false;
   }
   if (!passportIssueDate.value) {
     errors.value.passportIssueDate = 'Дата выдачи паспорта не может быть пустой';
     isValid = false;
   }
-  if (!departmentCode.value.trim()) {
-    errors.value.departmentCode = 'Код подразделения не может быть пустым';
+  if (!departmentCode.value.trim() || !/^\d{3}-\d{3}$/.test(departmentCode.value)) {
+    errors.value.departmentCode = 'Код подразделения не может быть пустым. Формат 123-456';
     isValid = false;
   }
   if (!region.value.trim()) {
@@ -97,6 +98,78 @@ function validate() {
     isValid = false;
   }
   return isValid;
+}
+
+function updateFirstName() {
+  if (errors.value.first_name && form.value.first_name.length > 2) {
+    errors.value.first_name = undefined;
+  }
+}
+
+function updateLastName() {
+  if (errors.value.last_name && form.value.last_name.length > 1) {
+    errors.value.last_name = undefined;
+  }
+}
+
+function updateDateOfBirth() {
+  if (errors.value.date_of_birth) {
+    errors.value.date_of_birth = undefined;
+  }
+}
+
+function updatePassportSeries() {
+  if (errors.value.passportSeries && /^\d{4}$/.test(passportSeries.value)) {
+    errors.value.passportSeries = undefined;
+  }
+}
+
+function updatePassportNumber() {
+  if (errors.value.passportNumber && /^\d{6}$/.test(passportNumber.value)) {
+    errors.value.passportNumber = undefined;
+  }
+}
+
+function updatePassportIssueDate() {
+  if (errors.value.passportIssueDate) {
+    errors.value.passportIssueDate = undefined;
+  }
+}
+
+function updatePassportIssuedBy() {
+  if (errors.value.passportIssuedBy && passportIssuedBy.value.startsWith('ОВД')) {
+    errors.value.passportIssuedBy = undefined;
+  }
+}
+
+function updateDepartmentCode() {
+  if (errors.value.departmentCode && /^\d{3}-\d{3}$/.test(departmentCode.value)) {
+    errors.value.departmentCode = undefined;
+  }
+}
+
+function updateRegion() {
+  if (errors.value.region) {
+    errors.value.region = undefined;
+  }
+}
+
+function updateCity() {
+  if (errors.value.city) {
+    errors.value.city = undefined;
+  }
+}
+
+function updateStreet() {
+  if (errors.value.street) {
+    errors.value.street = undefined;
+  }
+}
+
+function updateHouse() {
+  if (errors.value.house) {
+    errors.value.house = undefined;
+  }
 }
 
 const passportSeries = ref('');
@@ -298,6 +371,7 @@ watch(
               v-model="form.first_name"
               placeholder="Введите имя"
               class="input-field"
+              @update:model-value="updateFirstName"
               :class="{ 'input-error': errors.first_name }"
             />
             <div v-if="errors.first_name" class="error-message">{{ errors.first_name }}</div>
@@ -308,6 +382,7 @@ watch(
               v-model="form.last_name"
               placeholder="Введите фамилию"
               class="input-field"
+              @update:model-value="updateLastName"
               :class="{ 'input-error': errors.last_name }"
             />
             <div v-if="errors.last_name" class="error-message">{{ errors.last_name }}</div>
@@ -326,6 +401,7 @@ watch(
               v-model="passportSeries"
               placeholder="1234"
               class="input-field"
+              @update:model-value="updatePassportSeries"
               :class="{ 'input-error': errors.passportSeries }"
             />
             <div v-if="errors.passportSeries" class="error-message">
@@ -338,6 +414,7 @@ watch(
               v-model="passportNumber"
               placeholder="123456"
               class="input-field"
+              @update:model-value="updatePassportNumber"
               :class="{ 'input-error': errors.passportNumber }"
             />
             <div v-if="errors.passportNumber" class="error-message">
@@ -349,6 +426,7 @@ watch(
             <DateBase
               v-model="birthDateInput"
               class="input-field"
+              @update:model-value="updateDateOfBirth"
               :class="{ 'input-error': errors.date_of_birth }"
             />
             <div v-if="errors.date_of_birth" class="error-message">{{ errors.date_of_birth }}</div>
@@ -358,6 +436,7 @@ watch(
             <DateBase
               v-model="passportIssueDate"
               class="input-field"
+              @update:model-value="updatePassportIssueDate"
               :class="{ 'input-error': errors.passportIssueDate }"
             />
             <div v-if="errors.passportIssueDate" class="error-message">
@@ -371,6 +450,7 @@ watch(
             <label>Кем выдан паспорт:</label>
             <TBoxBase
               v-model="passportIssuedBy"
+              @update:modelValue="updatePassportIssuedBy"
               placeholder="ОВД района..."
               class="input-field"
               :class="{ 'input-error': errors.passportIssuedBy }"
@@ -383,6 +463,7 @@ watch(
             <label>Код подразделения:</label>
             <TBoxBase
               v-model="departmentCode"
+              @update:modelValue="updateDepartmentCode"
               placeholder="123-456"
               class="input-field"
               :class="{ 'input-error': errors.departmentCode }"
@@ -395,6 +476,7 @@ watch(
             <label>Область/Край:</label>
             <TBoxBase
               v-model="region"
+              @update:modelValue="updateRegion"
               placeholder="Московская область"
               class="input-field"
               :class="{ 'input-error': errors.region }"
@@ -406,6 +488,7 @@ watch(
             <TBoxBase
               v-model="city"
               placeholder="Москва"
+              @update:model-value="updateCity"
               class="input-field"
               :class="{ 'input-error': errors.city }"
             />
@@ -415,6 +498,7 @@ watch(
             <label>Улица:</label>
             <TBoxBase
               v-model="street"
+              @update:model-value="updateStreet"
               placeholder="Ленина"
               class="input-field"
               :class="{ 'input-error': errors.street }"
@@ -427,6 +511,7 @@ watch(
               <div class="address-item">
                 <TBoxBase
                   v-model="house"
+                  @update:model-value="updateHouse"
                   placeholder="Дом"
                   class="input-field"
                   :class="{ 'input-error': errors.house }"

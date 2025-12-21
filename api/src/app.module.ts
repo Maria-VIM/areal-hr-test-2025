@@ -11,8 +11,10 @@ import { FileModule } from './file/file.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { RedisService } from './redis/redis.service';
 import { HistoryModule } from './history/history.module';
+import { RedisModule } from './redis/redice.module';
+import { APP_GUARD } from '@nestjs/core';
+import { SessionGuard } from './auth/guards/session.guard';
 
 @Module({
     imports: [
@@ -33,8 +35,13 @@ import { HistoryModule } from './history/history.module';
         UserModule,
         AuthModule,
         HistoryModule,
+        RedisModule,
     ],
-    exports: [RedisService],
-    providers: [RedisService],
+    providers: [
+        {
+            provide: APP_GUARD,
+            useClass: SessionGuard,
+        },
+    ],
 })
 export class AppModule {}

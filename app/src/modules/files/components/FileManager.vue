@@ -51,6 +51,12 @@ function validate() {
   return isValid;
 }
 
+function updateCustomName() {
+  if (errors.value.name && customName.value.length > 2) {
+    errors.value.name = undefined;
+  }
+}
+
 const handleUpload = async () => {
   if (!selectedFile.value) return;
   if (!validate()) return;
@@ -92,6 +98,7 @@ const closeModal = () => {
         v-model="customName"
         placeholder="Введите имя файла"
         class="input-field"
+        @update:model-value="updateCustomName"
         :class="{ 'input-error': errors.name }"
       />
       <div v-if="errors.name" class="error-message">{{ errors.name }}</div>

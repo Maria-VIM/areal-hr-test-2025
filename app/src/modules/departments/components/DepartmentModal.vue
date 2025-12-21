@@ -70,6 +70,18 @@ async function handleSubmit() {
   emit('close');
 }
 
+function updateName() {
+  if (errors.value.name) {
+    errors.value.name = undefined;
+  }
+}
+
+function updateComment() {
+  if (errors.value.comment && form.value.comment.length > 4) {
+    errors.value.comment = undefined;
+  }
+}
+
 onMounted(() => {
   if (!props.IsEdit) {
     resetForm();
@@ -114,6 +126,7 @@ async function loadDepartment(id: number) {
             v-model="form.name"
             placeholder="Название отдела"
             class="input-field"
+            @update:modelValue="updateName"
             :class="{ 'input-error': errors.name }"
           />
           <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
@@ -121,6 +134,7 @@ async function loadDepartment(id: number) {
             v-model="form.comment"
             placeholder="Комментарий к отделу"
             class="input-field"
+            @update:model-value="updateComment"
             :class="{ 'input-error': errors.comment }"
           />
           <div v-if="errors.comment" class="error-message">{{ errors.comment }}</div>

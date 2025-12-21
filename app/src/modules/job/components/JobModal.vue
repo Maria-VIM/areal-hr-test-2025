@@ -6,6 +6,7 @@
         v-model="form.name"
         placeholder="Наименование должности"
         class="input-field"
+        @update:model-value="updateName"
         :class="{ 'input-error': errors.name }"
       />
       <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
@@ -57,6 +58,13 @@ function validate() {
   }
   return isValid;
 }
+
+function updateName() {
+  if (errors.value.name && form.value.name.length > 2) {
+    errors.value.name = undefined;
+  }
+}
+
 watch(
   () => props.id,
   async (newId) => {

@@ -44,6 +44,18 @@ function validate() {
   return isValid;
 }
 
+function updateName() {
+  if (errors.value.name) {
+    errors.value.name = undefined;
+  }
+}
+
+function updateComment() {
+  if (errors.value.comment && form.value.comment.length > 4) {
+    errors.value.comment = undefined;
+  }
+}
+
 async function handleSubmit() {
   if (!validate()) return;
   try {
@@ -87,7 +99,8 @@ watch(
         v-model="form.name"
         :placeholder="'Наименование организации'"
         class="input-field"
-        :class="{'input-error': errors.name }"
+        @update:model-value="updateName"
+        :class="{ 'input-error': errors.name }"
       />
       <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
 
@@ -95,7 +108,8 @@ watch(
         v-model="form.comment"
         :placeholder="'Комментарий к организации'"
         class="input-field"
-        :class="{'input-error': errors.comment}"
+        @update:model-value="updateComment"
+        :class="{ 'input-error': errors.comment }"
       />
       <div v-if="errors.comment" class="error-message">{{ errors.comment }}</div>
 
@@ -112,4 +126,3 @@ watch(
   border: 1px solid #731919;
 }
 </style>
-

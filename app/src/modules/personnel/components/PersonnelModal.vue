@@ -63,6 +63,34 @@ function validate() {
   return isValid;
 }
 
+function updateSalary() {
+  if (errors.value.salary) {
+    errors.value.salary = undefined;
+  }
+}
+
+function updateEmploymentDate() {
+  if (errors.value.employment_date) {
+    errors.value.employment_date = undefined;
+  }
+}
+
+function handleDepartmentChange(newDepartment: number | null) {
+  selectedDepartment.value = newDepartment;
+  form.value.department_id = newDepartment ?? 0;
+  if (errors.value.department) {
+    errors.value.department = undefined;
+  }
+}
+
+function handleJobChange(newJob: number | null) {
+  selectedJob.value = newJob;
+  form.value.job_id = newJob ?? 0;
+  if (errors.value.job) {
+    errors.value.job = undefined;
+  }
+}
+
 async function loadPersonnelOperation(id: number) {
   await store.getPersonnelOperationById(id);
   if (store.operation) {
@@ -149,7 +177,7 @@ watch(
         <label>Отдел</label>
         <DepartmentDropdown
           :model-value="selectedDepartment"
-          @update:model-value="selectedDepartment = $event"
+          @update:model-value="handleDepartmentChange"
           :organization_id="selectedOrganization"
           class="input-field"
           :class="{ 'input-error': errors.department }"
@@ -161,7 +189,7 @@ watch(
         <label>Должность</label>
         <JobDropdown
           :model-value="selectedJob"
-          @update:model-value="selectedJob = $event"
+          @update:model-value="handleJobChange"
           class="input-field"
           :class="{ 'input-error': errors.job }"
         />
@@ -174,6 +202,7 @@ watch(
           v-model="form.salary"
           placeholder="Введите зарплату"
           class="input-field"
+          @update:modelValue="updateSalary"
           :class="{ 'input-error': errors.salary }"
         />
         <div v-if="errors.salary" class="error-message">{{ errors.salary }}</div>
@@ -183,6 +212,7 @@ watch(
         <DateBase
           v-model="form.employment_date!"
           type="date"
+          @update:modelValue="updateEmploymentDate"
           class="input-field"
           :class="{ 'input-error': errors.employment_date }"
         />

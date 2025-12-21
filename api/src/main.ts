@@ -33,6 +33,7 @@ async function bootstrap() {
                 httpOnly: true,
                 maxAge: 1000 * 180 * 60,
             },
+            rolling: true,
         }),
     );
     await app.listen(configService.get('NESTPORT') || 3000);

@@ -9,9 +9,12 @@ export class HistoryService {
     constructor(private dbService: DbService) {}
     async getAll(entity: string, id: number): Promise<history[]> {
         const result: QueryResult = await this.dbService.query(
-            `SELECT h.id, old_values, new_values, h.created_at, e.first_name || ' ' || e.last_name as fio 
-        FROM "History" h JOIN "Employee" e ON h.user_id = e.user_id
-        WHERE operation_object = $1 AND record_id = $2`,
+            `SELECT h.id, h.old_values, h.new_values, h.created_at, 
+            e.first_name || ' ' || e.last_name as fio
+        FROM "History" h 
+        LEFT JOIN "Employee" e ON h.user_id = e.user_id
+        WHERE h.operation_object = $1 AND h.record_id = $2
+        ORDER BY h.created_at DESC`,
             [entity, id],
         );
         return result.rows;

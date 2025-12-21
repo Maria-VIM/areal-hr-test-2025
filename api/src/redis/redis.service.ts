@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 import { RedisStore } from 'connect-redis';
+import { Session } from 'express-session';
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -53,6 +54,19 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             await this.client.quit();
             console.log('Redis connection closed');
         }
+    }
+
+    async findSessionByUserId(userId: number): Promise<Session | null> {
+        const sessionKey = `session:user:${userId}`;
+        const sessionData = await this.client.get(sessionKey);
+        if (sessionData) {
+            return JSON.parse(sessionData) as Session;
+        }
+        return null;
+    }
+
+    async destroySession(sessionId: string): Promise<void> {
+        await this.client.del(sessionId);
     }
 
     getStore() {

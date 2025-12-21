@@ -6,10 +6,14 @@ import { Users } from './entity/entity-user';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from './entity/entity-role';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class UserService {
-    constructor(private dbService: DbService) {}
+    constructor(
+        private dbService: DbService,
+        private redisService: RedisService,
+    ) {}
     async findAll(): Promise<Users[]> {
         const result: QueryResult = await this.dbService.query(
             `SELECT u.id, e.first_name || ' ' || e.last_name as full_name, r.name, login, 
@@ -52,6 +56,11 @@ export class UserService {
             WHERE id = $1 RETURNING *`,
             [id],
         );
+        const userSession = await this.redisService.findSessionByUserId(id);
+        if (userSession) {
+            const sessionId = userSession.id;
+            await this.redisService.destroySession(sessionId);
+        }
         return result.rows[0];
     }
 
@@ -107,6 +116,11 @@ export class UserService {
             `UPDATE "User" SET is_active = false WHERE id = $1 RETURNING *`,
             [id],
         );
+        const userSession = await this.redisService.findSessionByUserId(id);
+        if (userSession) {
+            const sessionId = userSession.id;
+            await this.redisService.destroySession(sessionId);
+        }
         return result.rows[0];
     }
 }
